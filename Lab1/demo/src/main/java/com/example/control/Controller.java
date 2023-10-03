@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Controller {
     
     public void start(){
-
+        main_loop();
     }
 
     private void main_loop(){
