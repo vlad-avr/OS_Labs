@@ -1,9 +1,10 @@
 package com.example.func;
 
 public class FunctionF extends Function{
-    
-    public FunctionF(String input){
-        super(input);
+
+
+    public FunctionF(String input, int minorErrorAttempts){
+        super(input, minorErrorAttempts);
     }
 
     @Override
@@ -16,7 +17,16 @@ public class FunctionF extends Function{
             res.status = fatal_error_msg;
             return res;
         }
-        /*IMPLEMENT FUNCTION LATER */
+        if(val < 0 ){
+            for (int i = 0; i < minorErrorAttempts; i++) {
+                int flip = rnd.nextInt(2);
+                if(flip == 0){
+                    continue;
+                }else{
+                    val = (int)Math.ceil(Math.sqrt((double)val))
+                }
+            }
+        }
         res.value = val;
         res.status = success_msg;
         return res;
