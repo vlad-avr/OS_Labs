@@ -16,13 +16,15 @@ public class FunctionG extends Function {
                 throw exception;
             }
         } catch (NumberFormatException exception) {
-            res.status = fatal_error_msg;
+            res.status_string = fatal_error_msg;
+            res.status = Result.Status.FATAL_ERROR;
             return res;
         }
         try {
             Thread.sleep(rnd.nextInt(10000) + 5000);
         } catch (InterruptedException exception) {
-            res.status = fatal_error_msg;
+            res.status_string = fatal_error_msg;
+            res.status = Result.Status.FATAL_ERROR;
             return res;
         }
         if (val < 0) {
@@ -32,23 +34,27 @@ public class FunctionG extends Function {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException exception) {
-                        res.status = fatal_error_msg;
+                        res.status_string = fatal_error_msg;
+                        res.status = Result.Status.FATAL_ERROR;
                         return res;
                     }
                     continue;
                 } else {
                     val = (int) Math.ceil(Math.log((double) Math.abs(val)));
                     res.value = val;
-                    res.status = minor_error_msg + " : attempts taken - " + i;
+                    res.status_string = minor_error_msg + " : attempts taken - " + i;
+                    res.status = Result.Status.MINOR_ERROR;
                     return res;
                 }
             }
-            res.status = fatal_error_msg;
+            res.status_string = fatal_error_msg;
+            res.status = Result.Status.FATAL_ERROR;
             return res;
         }
         val = (int) Math.ceil(Math.log((double) val));
         res.value = val;
-        res.status = success_msg;
+        res.status_string = success_msg;
+        res.status = Result.Status.SUCCESS;
         return res;
     }
 
