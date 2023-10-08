@@ -34,6 +34,7 @@ public class Manager {
 
     public void calculate(String input) {
         // BufferData bufferData = new BufferData(input);
+        System.out.println("\n Calculating");
         this.input = input;
         futures.add(calculateF());
         futures.add(calculateG());
@@ -104,7 +105,7 @@ public class Manager {
     }
 
     public int GCD(int n2, int n1) {
-        System.out.println("\n\t " + n2 + "\t " + n1);
+       // System.out.println("\n\t " + n2 + "\t " + n1);
         if (n2 == 0) {
             return n1;
         }

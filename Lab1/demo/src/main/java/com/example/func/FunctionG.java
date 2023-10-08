@@ -20,13 +20,13 @@ public class FunctionG extends Function {
             res.status = Result.Status.FATAL_ERROR;
             return res;
         }
-        try {
-            Thread.sleep(rnd.nextInt(10000) + 5000);
-        } catch (InterruptedException exception) {
-            res.status_string = fatal_error_msg;
-            res.status = Result.Status.FATAL_ERROR;
-            return res;
-        }
+        // try {
+        //     Thread.sleep(rnd.nextInt(10000) + 5000);
+        // } catch (InterruptedException exception) {
+        //     res.status_string = fatal_error_msg;
+        //     res.status = Result.Status.FATAL_ERROR;
+        //     return res;
+        // }
         if (val < 0) {
             for (int i = 0; i < minorErrorAttempts; i++) {
                 int flip = rnd.nextInt(2);

@@ -15,13 +15,13 @@ public class FunctionF extends Function {
             res.status = Result.Status.FATAL_ERROR;
             return res;
         }
-        try {
-            Thread.sleep(rnd.nextInt(12000) + 6000);
-        } catch (InterruptedException exception) {
-            res.status_string = fatal_error_msg;
-            res.status = Result.Status.FATAL_ERROR;
-            return res;
-        }
+        // try {
+        //     Thread.sleep(rnd.nextInt(12000) + 6000);
+        // } catch (InterruptedException exception) {
+        //     res.status_string = fatal_error_msg;
+        //     res.status = Result.Status.FATAL_ERROR;
+        //     return res;
+        // }
         if (val < 0) {
             for (int i = 0; i < minorErrorAttempts; i++) {
                 int flip = rnd.nextInt(2);

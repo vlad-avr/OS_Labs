@@ -12,6 +12,7 @@ public class Controller {
 
     private void main_loop() {
         String input;
+        manager.calculate("4");
         while (true) {
             input = get_string("\nCommand: ");
             switch (input) {
