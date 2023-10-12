@@ -23,8 +23,10 @@ public class FunctionContainer extends Thread {
     public FunctionContainer(Function function, int minorErrorAttempts, PipedOutputStream fromManager,
             PipedInputStream toManager) {
         try {
-            PipedOutputStream out = new PipedOutputStream(toManager);
-            PipedInputStream in = new PipedInputStream(fromManager);
+            PipedOutputStream out = new PipedOutputStream();
+            connectToInputStream(out, toManager);
+            PipedInputStream in = new PipedInputStream();
+            connectToOutputStream(in, out);
             inputStream = new ObjectInputStream(in);
             outputStream = new ObjectOutputStream(out);
         } catch (IOException e) {
@@ -34,23 +36,23 @@ public class FunctionContainer extends Thread {
         this.minorErrorAttempts = minorErrorAttempts;
     }
 
-    // public void connectToInputStream(PipedInputStream inputStream) {
-    //     try {
-    //         this.outputStream.connect(inputStream);
-    //         inputStream.connect(this.outputStream);
-    //     } catch (IOException exception) {
-    //         System.out.println(exception.getMessage());
-    //     }
-    // }
+    public void connectToInputStream(PipedOutputStream outputStream, PipedInputStream inputStream) {
+        try {
+            outputStream.connect(inputStream);
+            inputStream.connect(outputStream);
+        } catch (IOException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
 
-    // public void connectToOutputStream(PipedOutputStream outputStream) {
-    //     try {
-    //         this.inputStream.connect(outputStream);
-    //         outputStream.connect(this.inputStream);
-    //     } catch (IOException exception) {
-    //         System.out.println(exception.getMessage());
-    //     }
-    // }
+    public void connectToOutputStream(PipedInputStream inputStream, PipedOutputStream outputStream) {
+        try {
+            inputStream.connect(outputStream);
+            outputStream.connect(inputStream);
+        } catch (IOException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
 
     public String getInputFromStream() {
         try {
@@ -67,6 +69,10 @@ public class FunctionContainer extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setValue(String value){
+        this.value = value;
     }
 
     private Future<Result> compute() {

@@ -4,7 +4,7 @@ public class Result {
     public Status status;
     public Integer value;
     public Integer attempts;
-
+    public String functionName;
     // protected static final String fatal_error_msg = "\nFatal Error has occurred:
     // computation canceled. Result : DECLINED!";
     // protected static final String minor_error_msg = "\nMinor Error has occurred:
@@ -37,11 +37,15 @@ public class Result {
     };
 
     public void show() {
-        System.out.println("\n Result status : " + status.toString());
+        System.out.println("\n Result status of " + functionName + " : " + status.toString());
         if (value != null) {
             System.out.println("\n Result value : " + value);
         }
         System.out.println("\n Attempts taken : " + attempts);
+    }
+
+    public void setFunctionName(String functionName){
+        this.functionName = functionName;
     }
 
     public String toString() {
