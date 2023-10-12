@@ -13,6 +13,8 @@ public abstract class Function {
     // protected Integer minorErrorAttempts;
     protected final SecureRandom rnd = new SecureRandom();
 
+
+    public abstract Result compute(String input, int minorErrorAttempts);
     // public Function(String input, int minorErrorAttempts){
     // this.input = input;
     // this.minorErrorAttempts = minorErrorAttempts;
