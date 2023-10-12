@@ -18,12 +18,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 public class Manager {
-    // private PipedInputStream f_input_stream;
-    // private PipedOutputStream f_output_stream;
-    // private PipedInputStream g_input_stream;
-    // private PipedOutputStream g_output_stream;
-    // private PipedInputStream controller_input_stream;
-    // private PipedOutputStream controller_output_stream;
     private PipedInputStream fInputStream = new PipedInputStream();
     private PipedInputStream gInputStream = new PipedInputStream();
     private PipedOutputStream fOutputStream = new PipedOutputStream();
@@ -36,8 +30,8 @@ public class Manager {
         // BufferData bufferData = new BufferData(input);
         System.out.println("\n Calculating");
         this.input = input;
-        futures.add(calculateF());
-        futures.add(calculateG());
+        // futures.add(calculateF());
+        // futures.add(calculateG());
         while (!futures.get(0).isDone() && !futures.get(1).isDone()) {
             continue;
         }
@@ -65,44 +59,44 @@ public class Manager {
         }
     }
 
-    public void cancel() {
-        futures.get(0).cancel(true);
-        futures.get(1).cancel(true);
-    }
+    // public void cancel() {
+    //     futures.get(0).cancel(true);
+    //     futures.get(1).cancel(true);
+    // }
 
-    private Future<Result> calculateF() {
-        return executors.submit(new Callable<Result>() {
-            public Result call() {
-                FunctionF f = new FunctionF();
-                f.connectToInputStream(fInputStream);
-                f.connectToOutputStream(fOutputStream);
-                try {
-                    fOutputStream.write(input.getBytes(), 0, input.length());
-                    fOutputStream.flush();
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-                return f.compute(f.getInputFromStream(input.length()), 10);
-            }
-        });
-    }
+    // private Future<Result> calculateF() {
+    //     return executors.submit(new Callable<Result>() {
+    //         public Result call() {
+    //             FunctionF f = new FunctionF();
+    //             f.connectToInputStream(fInputStream);
+    //             f.connectToOutputStream(fOutputStream);
+    //             try {
+    //                 fOutputStream.write(input.getBytes(), 0, input.length());
+    //                 fOutputStream.flush();
+    //             } catch (IOException e) {
+    //                 System.out.println(e.getMessage());
+    //             }
+    //             return f.compute(f.getInputFromStream(input.length()), 10);
+    //         }
+    //     });
+    // }
 
-    private Future<Result> calculateG() {
-        return executors.submit(new Callable<Result>() {
-            public Result call() {
-                FunctionG g = new FunctionG();
-                g.connectToInputStream(gInputStream);
-                g.connectToOutputStream(gOutputStream);
-                try {
-                    gOutputStream.write(input.getBytes(), 0, input.length());
-                    gOutputStream.flush();
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-                return g.compute(g.getInputFromStream(input.length()), 10);
-            }
-        });
-    }
+    // private Future<Result> calculateG() {
+    //     return executors.submit(new Callable<Result>() {
+    //         public Result call() {
+    //             FunctionG g = new FunctionG();
+    //             g.connectToInputStream(gInputStream);
+    //             g.connectToOutputStream(gOutputStream);
+    //             try {
+    //                 gOutputStream.write(input.getBytes(), 0, input.length());
+    //                 gOutputStream.flush();
+    //             } catch (IOException e) {
+    //                 System.out.println(e.getMessage());
+    //             }
+    //             return g.compute(g.getInputFromStream(input.length()), 10);
+    //         }
+    //     });
+    // }
 
     public int GCD(int n2, int n1) {
        // System.out.println("\n\t " + n2 + "\t " + n1);
