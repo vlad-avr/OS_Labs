@@ -1,6 +1,8 @@
 package com.example.func;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.Callable;
@@ -11,53 +13,59 @@ import java.util.concurrent.Future;
 public class FunctionContainer extends Thread {
     private Function function;
     private ExecutorService service = Executors.newSingleThreadExecutor();
-    private PipedInputStream inputStream = new PipedInputStream();
-    private PipedOutputStream outputStream = new PipedOutputStream();
+    // private PipedInputStream inputStream = new PipedInputStream();
+    // private PipedOutputStream outputStream = new PipedOutputStream();
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
     private int minorErrorAttempts;
     private String value;
 
-    public FunctionContainer(Function function, int minorErrorAttempts) {
+    public FunctionContainer(Function function, int minorErrorAttempts, PipedOutputStream fromManager,
+            PipedInputStream toManager) {
+        try {
+            PipedOutputStream out = new PipedOutputStream(toManager);
+            PipedInputStream in = new PipedInputStream(fromManager);
+            inputStream = new ObjectInputStream(in);
+            outputStream = new ObjectOutputStream(out);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         this.function = function;
         this.minorErrorAttempts = minorErrorAttempts;
     }
 
-    public void connectToInputStream(PipedInputStream inputStream) {
-        try {
-            this.outputStream.connect(inputStream);
-            inputStream.connect(this.outputStream);
-        } catch (IOException exception) {
-            System.out.println(exception.getMessage());
-        }
-    }
+    // public void connectToInputStream(PipedInputStream inputStream) {
+    //     try {
+    //         this.outputStream.connect(inputStream);
+    //         inputStream.connect(this.outputStream);
+    //     } catch (IOException exception) {
+    //         System.out.println(exception.getMessage());
+    //     }
+    // }
 
-    public void connectToOutputStream(PipedOutputStream outputStream) {
-        try {
-            this.inputStream.connect(outputStream);
-            outputStream.connect(this.inputStream);
-        } catch (IOException exception) {
-            System.out.println(exception.getMessage());
-        }
-    }
+    // public void connectToOutputStream(PipedOutputStream outputStream) {
+    //     try {
+    //         this.inputStream.connect(outputStream);
+    //         outputStream.connect(this.inputStream);
+    //     } catch (IOException exception) {
+    //         System.out.println(exception.getMessage());
+    //     }
+    // }
 
-    public String getInputFromStream(int inputLen) {
+    public String getInputFromStream() {
         try {
-            String res = "";
-            for (int i = 0; i < inputLen; i++) {
-                res += (char) inputStream.read();
-            }
-            return res;
-        } catch (IOException exception) {
-            // Should not trigger
-            System.out.println(exception.getMessage());
+            return (String)inputStream.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
             return "";
         }
     }
 
-    public void putOutputToStream(byte data) {
+    public void putOutputToStream(String output) {
         try {
-            outputStream.write(data);
+            outputStream.writeObject(output);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -75,8 +83,7 @@ public class FunctionContainer extends Thread {
         while (!result.isDone()) {
             try {
                 if (inputStream.available() != 0) {
-                    int inputSize = inputStream.available();
-                    String input = getInputFromStream(inputSize);
+                    String input = getInputFromStream();
                     switch (input) {
                         case "s": // cancel
                             break;
@@ -87,7 +94,7 @@ public class FunctionContainer extends Thread {
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
-
         }
+        putOutputToStream(result.toString());
     }
 }

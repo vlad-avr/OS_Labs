@@ -11,8 +11,8 @@ public class FunctionF extends Function {
         try {
             val = Integer.parseInt(input);
         } catch (NumberFormatException exception) {
-            res.status_string = fatal_error_msg;
             res.status = Result.Status.FATAL_ERROR;
+            res.attempts = 0;
             return res;
         }
         // try {
@@ -29,7 +29,7 @@ public class FunctionF extends Function {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException exception) {
-                        res.status_string = fatal_error_msg;
+                        res.attempts = i;
                         res.status = Result.Status.FATAL_ERROR;
                         return res;
                     }
@@ -37,18 +37,18 @@ public class FunctionF extends Function {
                 } else {
                     val = (int) Math.ceil(Math.sqrt((double) Math.abs(val)));
                     res.value = val;
-                    res.status_string = minor_error_msg + " : attempts taken - " + i;
+                    res.attempts = i;
                     res.status = Result.Status.MINOR_ERROR;
                     return res;
                 }
             }
-            res.status_string = fatal_error_msg;
+            res.attempts = minorErrorAttempts;
             res.status = Result.Status.FATAL_ERROR;
             return res;
         }
         val = (int) Math.ceil(Math.sqrt((double) val));
         res.value = val;
-        res.status_string = success_msg;
+        res.attempts = 1;
         res.status = Result.Status.SUCCESS;
         return res;
     }

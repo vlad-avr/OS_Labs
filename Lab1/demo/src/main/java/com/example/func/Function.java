@@ -1,8 +1,8 @@
 package com.example.func;
 
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+// import java.io.IOException;
+// import java.io.PipedInputStream;
+// import java.io.PipedOutputStream;
 import java.security.SecureRandom;
 
 public abstract class Function {
