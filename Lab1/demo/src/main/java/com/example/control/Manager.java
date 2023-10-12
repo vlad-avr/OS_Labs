@@ -35,9 +35,10 @@ public class Manager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
-    public void putOutputToStream(String output, ObjectOutputStream outputStream){
+    public void putOutputToStream(String output, ObjectOutputStream outputStream) {
         try {
             outputStream.writeObject(output);
         } catch (IOException e) {
@@ -45,32 +46,32 @@ public class Manager {
         }
     }
 
-    public String getInputFromStream(ObjectInputStream inputStream){
+    public String getInputFromStream(ObjectInputStream inputStream) {
         try {
-            return (String)inputStream.readObject();
+            return (String) inputStream.readObject();
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
             return "";
         }
     }
 
-    public void calculate(String value){
+    public void calculate(String value) {
         functionF.setValue(value);
         functionG.setValue(value);
         functionF.start();
         functionG.start();
         Result resF = null;
         Result resG = null;
-        while(true){
+        while (true) {
             try {
-                if(resF != null && resG != null){
+                if (resF != null && resG != null) {
                     break;
                 }
-                if(inputStreamF.available() != 0){
+                if (inputStreamF.available() != 0) {
                     resF = new Result(getInputFromStream(inputStreamF));
                     resF.setFunctionName("F(x)");
                 }
-                if(inputStreamG.available() != 0){
+                if (inputStreamG.available() != 0) {
                     resG = new Result(getInputFromStream(inputStreamG));
                     resG.setFunctionName("G(x)");
                 }

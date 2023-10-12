@@ -24,9 +24,10 @@ public class FunctionContainer extends Thread {
             PipedInputStream toManager) {
         try {
             PipedOutputStream out = new PipedOutputStream();
-            connectToInputStream(out, toManager);
+            //connectToInputStream(out, toManager);
             PipedInputStream in = new PipedInputStream();
-            connectToOutputStream(in, out);
+            connectToOutputStream(in, fromManager);
+            connectToOutputStream(toManager, out);
             inputStream = new ObjectInputStream(in);
             outputStream = new ObjectOutputStream(out);
         } catch (IOException e) {
@@ -36,19 +37,19 @@ public class FunctionContainer extends Thread {
         this.minorErrorAttempts = minorErrorAttempts;
     }
 
-    public void connectToInputStream(PipedOutputStream outputStream, PipedInputStream inputStream) {
-        try {
-            outputStream.connect(inputStream);
-            inputStream.connect(outputStream);
-        } catch (IOException exception) {
-            System.out.println(exception.getMessage());
-        }
-    }
+    // public void connectToInputStream(PipedOutputStream outputStream, PipedInputStream inputStream) {
+    //     try {
+    //         outputStream.connect(inputStream);
+    //         //inputStream.connect(outputStream);
+    //     } catch (IOException exception) {
+    //         System.out.println(exception.getMessage());
+    //     }
+    // }
 
     public void connectToOutputStream(PipedInputStream inputStream, PipedOutputStream outputStream) {
         try {
             inputStream.connect(outputStream);
-            outputStream.connect(inputStream);
+           // outputStream.connect(inputStream);
         } catch (IOException exception) {
             System.out.println(exception.getMessage());
         }
