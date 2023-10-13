@@ -13,51 +13,58 @@ import com.example.func.Result;
 
 public class Manager {
 
-    private ObjectInputStream inputStreamF;
-    private ObjectOutputStream outputStreamF;
-    private ObjectInputStream inputStreamG;
-    private ObjectOutputStream outputStreamG;
+    private PipedInputStream inputStreamF;
+    private PipedOutputStream outputStreamF;
+    private PipedInputStream inputStreamG;
+    private PipedOutputStream outputStreamG;
     private FunctionContainer functionF;
     private FunctionContainer functionG;
 
     public Manager() {
-        PipedInputStream inF = new PipedInputStream();
-        PipedOutputStream outF = new PipedOutputStream();
-        PipedInputStream inG = new PipedInputStream();
-        PipedOutputStream outG = new PipedOutputStream();
-        functionF = new FunctionContainer(new FunctionF(), 10, outF, inF);
-        functionG = new FunctionContainer(new FunctionG(), 8, outG, inG);
-        try {
-            inputStreamF = new ObjectInputStream(inF);
-            outputStreamF = new ObjectOutputStream(outF);
-            inputStreamG = new ObjectInputStream(inG);
-            outputStreamG = new ObjectOutputStream(outG);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        outputStreamF = new PipedOutputStream();
+        inputStreamF = new PipedInputStream();
+        outputStreamG = new PipedOutputStream();
+        inputStreamG = new PipedInputStream();
+        functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF);
+        functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
+        // try {
+        // outputStreamF = new ObjectOutputStream(outF);
+        // inputStreamF = new ObjectInputStream(inF);
+        // outputStreamG = new ObjectOutputStream(outG);
+        // inputStreamG = new ObjectInputStream(inG);
+        // } catch (IOException e) {
+        // e.printStackTrace();
+        // }
 
     }
 
-    public void putOutputToStream(String output, ObjectOutputStream outputStream) {
+    public void putOutputToStream(String output, PipedOutputStream outputStream) {
         try {
-            outputStream.writeObject(output);
+            ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+            oos.writeUTF(output);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public String getInputFromStream(ObjectInputStream inputStream) {
+    public String getInputFromStream(PipedInputStream inputStream) {
         try {
-            return (String) inputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
+            ObjectInputStream ois = new ObjectInputStream(inputStream);
+            return (String) ois.readUTF();
+        } catch (IOException e) {
             e.printStackTrace();
             return "";
         }
     }
 
     public void calculate(String value) {
-        functionF.setValue(value);
-        functionG.setValue(value);
+        if (functionF.isAlive() || functionG.isAlive()) {
+            System.out.println(
+                    "\nThere is an ongoing computation present right now. You can not start another one - cancel first!\n");
+            return;
+        }
+        putOutputToStream(value, outputStreamF);
+        putOutputToStream(value, outputStreamG);
         functionF.start();
         functionG.start();
         Result resF = null;
@@ -67,12 +74,15 @@ public class Manager {
                 if (resF != null && resG != null) {
                     break;
                 }
-                if (inputStreamF.available() != 0) {
-                    resF = new Result(getInputFromStream(inputStreamF));
+                String str = getInputFromStream(inputStreamF);
+                if (str != "") {
+                    resF = new Result(str);
                     resF.setFunctionName("F(x)");
                 }
-                if (inputStreamG.available() != 0) {
-                    resG = new Result(getInputFromStream(inputStreamG));
+
+                str = getInputFromStream(inputStreamG);
+                if (str != "") {
+                    resG = new Result(str);
                     resG.setFunctionName("G(x)");
                 }
             } catch (Exception e) {

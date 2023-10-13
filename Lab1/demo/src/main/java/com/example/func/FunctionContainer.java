@@ -15,41 +15,24 @@ public class FunctionContainer extends Thread {
     private ExecutorService service = Executors.newSingleThreadExecutor();
     // private PipedInputStream inputStream = new PipedInputStream();
     // private PipedOutputStream outputStream = new PipedOutputStream();
-    private ObjectOutputStream outputStream;
-    private ObjectInputStream inputStream;
+    private PipedOutputStream outputStream;
+    private PipedInputStream inputStream;
     private int minorErrorAttempts;
     private String value;
 
     public FunctionContainer(Function function, int minorErrorAttempts, PipedOutputStream fromManager,
             PipedInputStream toManager) {
-        try {
-            PipedOutputStream out = new PipedOutputStream();
-            //connectToInputStream(out, toManager);
-            PipedInputStream in = new PipedInputStream();
-            connectToOutputStream(in, fromManager);
-            connectToOutputStream(toManager, out);
-            inputStream = new ObjectInputStream(in);
-            outputStream = new ObjectOutputStream(out);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        outputStream = new PipedOutputStream();
+        inputStream = new PipedInputStream();
+        connectToOutputStream(toManager, outputStream);
+        connectToOutputStream(inputStream, fromManager);
         this.function = function;
         this.minorErrorAttempts = minorErrorAttempts;
     }
 
-    // public void connectToInputStream(PipedOutputStream outputStream, PipedInputStream inputStream) {
-    //     try {
-    //         outputStream.connect(inputStream);
-    //         //inputStream.connect(outputStream);
-    //     } catch (IOException exception) {
-    //         System.out.println(exception.getMessage());
-    //     }
-    // }
-
     public void connectToOutputStream(PipedInputStream inputStream, PipedOutputStream outputStream) {
         try {
             inputStream.connect(outputStream);
-           // outputStream.connect(inputStream);
         } catch (IOException exception) {
             System.out.println(exception.getMessage());
         }
@@ -57,8 +40,12 @@ public class FunctionContainer extends Thread {
 
     public String getInputFromStream() {
         try {
-            return (String)inputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
+            ObjectInputStream ois = new ObjectInputStream(inputStream);
+            String res = ois.readUTF();
+            System.out.println(res);
+            return res;
+            //return (String) ois.readUTF();
+        } catch (IOException e) {
             e.printStackTrace();
             return "";
         }
@@ -66,15 +53,16 @@ public class FunctionContainer extends Thread {
 
     public void putOutputToStream(String output) {
         try {
-            outputStream.writeObject(output);
+            ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+            oos.writeUTF(output);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void setValue(String value){
-        this.value = value;
-    }
+    // public void setValue(String value) {
+    // this.value = value;
+    // }
 
     private Future<Result> compute() {
         return service.submit(new Callable<Result>() {
@@ -86,6 +74,12 @@ public class FunctionContainer extends Thread {
 
     @Override
     public void run() {
+        while (true) {
+            value = getInputFromStream();
+            if (value != "") {
+                break;
+            }
+        }
         Future<Result> result = compute();
         while (!result.isDone()) {
             try {
