@@ -5,11 +5,6 @@ public class Result {
     public Integer value;
     public Integer attempts;
     public String functionName;
-    // protected static final String fatal_error_msg = "\nFatal Error has occurred:
-    // computation canceled. Result : DECLINED!";
-    // protected static final String minor_error_msg = "\nMinor Error has occurred:
-    // computation results undefined. Result : UNDEFINED";
-    // protected static final String success_msg = "\nComputation successful!";
     public static enum Status {
         SUCCESS,
         MINOR_ERROR,

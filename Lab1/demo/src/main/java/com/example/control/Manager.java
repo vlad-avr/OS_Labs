@@ -19,6 +19,7 @@ public class Manager {
     private PipedOutputStream outputStreamG;
     private FunctionContainer functionF;
     private FunctionContainer functionG;
+    private boolean isComputing = false;
 
     public Manager() {
         outputStreamF = new PipedOutputStream();
@@ -27,15 +28,14 @@ public class Manager {
         inputStreamG = new PipedInputStream();
         functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF);
         functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
-        // try {
-        // outputStreamF = new ObjectOutputStream(outF);
-        // inputStreamF = new ObjectInputStream(inF);
-        // outputStreamG = new ObjectOutputStream(outG);
-        // inputStreamG = new ObjectInputStream(inG);
-        // } catch (IOException e) {
-        // e.printStackTrace();
-        // }
+        functionF.start();
+        functionG.start();
 
+    }
+
+    public void Done() {
+        functionF.stop();
+        functionG.stop();
     }
 
     public void putOutputToStream(String output, PipedOutputStream outputStream) {
@@ -56,25 +56,16 @@ public class Manager {
             return "";
         }
     }
-    // public String getInputFromStreamG() {
-    //     try {
-    //         ObjectInputStream ois = new ObjectInputStream(inputStreamG);
-    //         return ois.readUTF();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //         return "";
-    //     }
-    // }
+
     public void calculate(String value) {
-        if (functionF.isAlive() || functionG.isAlive()) {
+        if (isComputing) {
             System.out.println(
                     "\nThere is an ongoing computation present right now. You can not start another one - cancel first!\n");
             return;
         }
+        isComputing = true;
         putOutputToStream(value, outputStreamF);
         putOutputToStream(value, outputStreamG);
-        functionF.start();
-        functionG.start();
         Result resF = null;
         Result resG = null;
         while (true) {
@@ -82,13 +73,13 @@ public class Manager {
                 if (resF != null && resG != null) {
                     break;
                 }
-                if(inputStreamF.available() > 0){
+                if (inputStreamF.available() > 0) {
                     String str = getInputFromStream(inputStreamF);
                     System.out.println(str);
                     resF = new Result(str);
                     resF.setFunctionName("F(x)");
                 }
-                if(inputStreamG.available() > 0){
+                if (inputStreamG.available() > 0) {
                     String str = getInputFromStream(inputStreamG);
                     System.out.println(str);
                     resG = new Result(str);
@@ -100,11 +91,16 @@ public class Manager {
         }
         resF.show();
         resG.show();
-        System.out.println(GCD(resF.value, resG.value));
+        if (resF.status == Result.Status.FATAL_ERROR || resG.status == Result.Status.FATAL_ERROR) {
+            System.out.println(
+                    "\nUnable to compute GCD because one or more functions caught Fatal Errors during computation!");
+        } else {
+            System.out.println("\n GCD : " + GCD(resF.value, resG.value));
+        }
+        isComputing = false;
     }
 
     public int GCD(int n1, int n2) {
-        // System.out.println("\n\t " + n2 + "\t " + n1);
         if (n2 == 0) {
             return n1;
         }

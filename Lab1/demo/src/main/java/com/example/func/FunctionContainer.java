@@ -14,12 +14,11 @@ import java.util.concurrent.Future;
 public class FunctionContainer extends Thread {
     private Function function;
     private ExecutorService service = Executors.newSingleThreadExecutor();
-    // private PipedInputStream inputStream = new PipedInputStream();
-    // private PipedOutputStream outputStream = new PipedOutputStream();
     private PipedOutputStream outputStream;
     private PipedInputStream inputStream;
     private int minorErrorAttempts;
     private String value;
+    public static boolean allDone = false;
 
     public FunctionContainer(Function function, int minorErrorAttempts, PipedOutputStream fromManager,
             PipedInputStream toManager) {
@@ -42,10 +41,7 @@ public class FunctionContainer extends Thread {
     public String getInputFromStream() {
         try {
             ObjectInputStream in = new ObjectInputStream(inputStream);
-            // //System.out.println((String)in.readUTF());
-            // System.out.println("KKK");
             return (String) in.readObject();
-            // return (String) ois.readUTF();
         } catch (IOException | ClassNotFoundException e) {
             System.out.println(e.getMessage());
             return "";
@@ -56,15 +52,11 @@ public class FunctionContainer extends Thread {
         try {
             ObjectOutputStream out = new ObjectOutputStream(outputStream);
             out.writeObject(output);
-            out.close();
+            // out.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
-
-    // public void setValue(String value) {
-    // this.value = value;
-    // }
 
     private Future<Result> compute() {
         return service.submit(new Callable<Result>() {
@@ -76,39 +68,42 @@ public class FunctionContainer extends Thread {
 
     @Override
     public void run() {
-        try {
-            while (inputStream.available() == 0) {
-                System.out.println("NO INPUT");
-                continue;
-            }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-        value = getInputFromStream();
-        //System.out.println("\n" + value);
-        Future<Result> result = compute();
-        while (!result.isDone()) {
+        while (!allDone) {
             try {
-                if (inputStream.available() != 0) {
-                    String input = getInputFromStream();
-                    switch (input) {
-                        case "s": // cancel
-                            break;
-                        case "r": // report
-                            break;
+                while (inputStream.available() == 0) {
+                    if(allDone){
+                        return;
                     }
+                    //System.out.println("NO INPUT");
+                    continue;
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
+                e.printStackTrace();
             }
-        }
-        try {
-            System.out.println(result.get().toString());
-            putOutputToStream(result.get().toString());
-        } catch (InterruptedException | ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            value = getInputFromStream();
+            // System.out.println("\n" + value);
+            Future<Result> result = compute();
+            while (!result.isDone()) {
+                try {
+                    if (inputStream.available() != 0) {
+                        String input = getInputFromStream();
+                        switch (input) {
+                            case "s": // cancel
+                                break;
+                            case "r": // report
+                                break;
+                        }
+                    }
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+            try {
+                putOutputToStream(result.get().toString());
+            } catch (InterruptedException | ExecutionException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 }

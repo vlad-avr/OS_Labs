@@ -7,12 +7,11 @@ public class Controller {
     Manager manager = new Manager();
 
     public void start() {
-        main_loop();
+        mainLoop();
     }
 
-    private void main_loop() {
+    private void mainLoop() {
         String input;
-        //manager.calculate("4");
         while (true) {
             input = get_string("\nCommand: ");
             switch (input) {
@@ -28,6 +27,7 @@ public class Controller {
                     help();
                     break;
                 case "e":
+                    manager.Done();
                     return;
                 default:
                     System.out.println("\nUnknown command!");

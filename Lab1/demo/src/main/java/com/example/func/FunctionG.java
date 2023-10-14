@@ -20,19 +20,19 @@ public class FunctionG extends Function {
             res.status = Result.Status.FATAL_ERROR;
             return res;
         }
-        // try {
-        //     Thread.sleep(rnd.nextInt(10000) + 5000);
-        // } catch (InterruptedException exception) {
-        //     res.status_string = fatal_error_msg;
-        //     res.status = Result.Status.FATAL_ERROR;
-        //     return res;
-        // }
+        try {
+            Thread.sleep(rnd.nextInt(10000) + 5000);
+        } catch (InterruptedException exception) {
+            res.status = Result.Status.FATAL_ERROR;
+            res.attempts = 0;
+            return res;
+        }
         if (val < 0) {
             for (int i = 0; i < minorErrorAttempts; i++) {
                 int flip = rnd.nextInt(2);
                 if (flip == 0) {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(400);
                     } catch (InterruptedException exception) {
                         res.attempts = i;
                         res.status = Result.Status.FATAL_ERROR;
@@ -57,9 +57,4 @@ public class FunctionG extends Function {
         res.status = Result.Status.SUCCESS;
         return res;
     }
-
-    // @Override
-    // public void run() {
-    //     compute();
-    // }
 }
