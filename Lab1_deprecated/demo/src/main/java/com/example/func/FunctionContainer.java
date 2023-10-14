@@ -15,8 +15,8 @@ public class FunctionContainer extends Thread {
     private ExecutorService service = Executors.newSingleThreadExecutor();
     // private PipedInputStream inputStream = new PipedInputStream();
     // private PipedOutputStream outputStream = new PipedOutputStream();
-    private PipedOutputStream outputStream;
-    private PipedInputStream inputStream;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
     private int minorErrorAttempts;
     private String value;
 
@@ -26,6 +26,14 @@ public class FunctionContainer extends Thread {
         PipedInputStream input = new PipedInputStream();
         connectToOutputStream(toManager, output);
         connectToOutputStream(input, fromManager);
+        try {
+            outputStream = new ObjectOutputStream(output);
+            inputStream = new ObjectInputStream(input);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         this.function = function;
         this.minorErrorAttempts = minorErrorAttempts;
     }
@@ -40,8 +48,7 @@ public class FunctionContainer extends Thread {
 
     public String getInputFromStream() {
         try {
-            ObjectInputStream in = new ObjectInputStream(inputStream);
-            return in.readUTF();
+            return inputStream.readUTF();
             //return (String) ois.readUTF();
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,8 +58,7 @@ public class FunctionContainer extends Thread {
 
     public void putOutputToStream(String output) {
         try {
-            ObjectOutputStream out = new ObjectOutputStream(outputStream);
-            out.writeUTF(output);
+            outputStream.writeUTF(output);
         } catch (IOException e) {
             e.printStackTrace();
         }

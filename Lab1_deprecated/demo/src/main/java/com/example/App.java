@@ -1,28 +1,24 @@
 package com.example;
 
-import com.example.control.Controller;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
-// import java.io.IOException;
-// import java.io.ObjectInputStream;
-// import java.io.ObjectOutputStream;
-// import java.io.PipedInputStream;
-// import java.io.PipedOutputStream;
+import com.example.control.Controller;
 
 /**
  * Hello world!
+ *
  */
-public final class App {
-    private App() {
-    }
-
-    /**
-     * Says hello to the world.
-     * @param args The arguments of the program.
-     */
-    public static void main(String[] args) {
-        Controller controller = new Controller();
-        controller.start();
-        // System.out.println("HELOO");
+public class App 
+{
+    public static void main( String[] args )
+    {
+        // Controller controller = new Controller();
+        // controller.start();
+        System.out.println("HELOO");
         // try {
         //     PipedOutputStream outStream = new PipedOutputStream(); 
         //     PipedInputStream inputStream = new PipedInputStream(outStream);
