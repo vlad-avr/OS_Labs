@@ -41,30 +41,30 @@ public class Manager {
     public void putOutputToStream(String output, PipedOutputStream outputStream) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(outputStream);
-            oos.writeUTF(output);
+            oos.writeObject(output);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
-    public String getInputFromStreamF() {
+    public String getInputFromStream(PipedInputStream inputStream) {
         try {
-            ObjectInputStream ois = new ObjectInputStream(inputStreamF);
-            return ois.readUTF();
-        } catch (IOException e) {
-            e.printStackTrace();
+            ObjectInputStream ois = new ObjectInputStream(inputStream);
+            return (String) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
             return "";
         }
     }
-    public String getInputFromStreamG() {
-        try {
-            ObjectInputStream ois = new ObjectInputStream(inputStreamG);
-            return ois.readUTF();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
+    // public String getInputFromStreamG() {
+    //     try {
+    //         ObjectInputStream ois = new ObjectInputStream(inputStreamG);
+    //         return ois.readUTF();
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //         return "";
+    //     }
+    // }
     public void calculate(String value) {
         if (functionF.isAlive() || functionG.isAlive()) {
             System.out.println(
@@ -82,26 +82,28 @@ public class Manager {
                 if (resF != null && resG != null) {
                     break;
                 }
-                String str = getInputFromStreamF();
-                if (str != "") {
+                if(inputStreamF.available() > 0){
+                    String str = getInputFromStream(inputStreamF);
+                    System.out.println(str);
                     resF = new Result(str);
                     resF.setFunctionName("F(x)");
                 }
-
-                str = getInputFromStreamG();
-                if (str != "") {
+                if(inputStreamG.available() > 0){
+                    String str = getInputFromStream(inputStreamG);
+                    System.out.println(str);
                     resG = new Result(str);
                     resG.setFunctionName("G(x)");
                 }
             } catch (Exception e) {
-                // TODO: handle exception
+                System.out.println(e.getMessage());
             }
         }
-        System.out.println(resF.toString());
-        System.out.println(resG.toString());
+        resF.show();
+        resG.show();
+        System.out.println(GCD(resF.value, resG.value));
     }
 
-    public int GCD(int n2, int n1) {
+    public int GCD(int n1, int n2) {
         // System.out.println("\n\t " + n2 + "\t " + n1);
         if (n2 == 0) {
             return n1;

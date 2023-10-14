@@ -25,9 +25,9 @@ public class Result {
         status = Status.valueOf(strToParse.substring(0, strToParse.indexOf("\t")));
         try {
             if (status != Status.FATAL_ERROR) {
-                value = Integer.parseInt(strToParse.substring(strToParse.indexOf("\t") + 1, strToParse.length()));
+                value = Integer.parseInt(strToParse.substring(strToParse.indexOf("\t") + 1, strToParse.lastIndexOf("\t")));
             }
-            attempts = Integer.parseInt(strToParse.substring(strToParse.lastIndexOf("\t"), strToParse.length()));
+            attempts = Integer.parseInt(strToParse.substring(strToParse.lastIndexOf("\t") + 1, strToParse.length()));
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
