@@ -2,16 +2,23 @@ package com.example.control;
 
 import java.util.Scanner;
 
-public class Controller {
+public class Controller{
 
-    Manager manager = new Manager();
+    private Manager manager = new Manager(this);
+    private Scanner scan = new Scanner(System.in);
 
     public void start() {
         mainLoop();
     }
 
+    public Scanner getScanner(){
+        return this.scan;
+    }
+
     private void mainLoop() {
         String input;
+
+        help();
         while (true) {
             input = get_string("\nCommand: ");
             switch (input) {
@@ -19,10 +26,11 @@ public class Controller {
                     input = get_string("\n Enter number: ");
                     manager.calculate(input);
                     break;
-                case "s":
-                    /* cancel */break;
-                case "r":
-                    /* report */break;
+                // case "s":
+                //     manager.cancel();
+                //     break;
+                // case "r":
+                //     /* report */break;
                 case "h":
                     help();
                     break;
@@ -37,11 +45,10 @@ public class Controller {
 
     private void help() {
         System.out.println(
-                "\n c -> start calculation;\n s -> cancel current computation;\n r -> get a report on program status;\n h -> print help;\n e - exit program");
+                "\n c -> start calculation;\n s -> cancel current computation;\n r -> get report on current computation;\n h -> print help;\n e -> exit program");
     }
 
     private String get_string(String prompt) {
-        Scanner scan = new Scanner(System.in);
         String res;
         do {
             System.out.println(prompt);

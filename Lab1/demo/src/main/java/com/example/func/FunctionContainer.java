@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,10 +72,11 @@ public class FunctionContainer extends Thread {
         while (!allDone) {
             try {
                 while (inputStream.available() == 0) {
-                    if(allDone){
+                    if (allDone) {
+                        service.shutdown();
                         return;
                     }
-                    //System.out.println("NO INPUT");
+                    // System.out.println("NO INPUT");
                     continue;
                 }
             } catch (IOException e) {
@@ -84,25 +86,29 @@ public class FunctionContainer extends Thread {
             value = getInputFromStream();
             // System.out.println("\n" + value);
             Future<Result> result = compute();
-            while (!result.isDone()) {
+            while (!result.isDone() && !result.isCancelled()) {
                 try {
                     if (inputStream.available() != 0) {
                         String input = getInputFromStream();
                         switch (input) {
-                            case "s": // cancel
+                            case "s":
+                                result.cancel(true);
+                                System.out.println("\nComputations canceled!");
                                 break;
                             case "r": // report
                                 break;
                         }
                     }
-                } catch (IOException e) {
+                } catch (IOException | CancellationException e) {
                     System.out.println(e.getMessage());
                 }
             }
-            try {
-                putOutputToStream(result.get().toString());
-            } catch (InterruptedException | ExecutionException e) {
-                System.out.println(e.getMessage());
+            if (!result.isCancelled()) {
+                try {
+                    putOutputToStream(result.get().toString());
+                } catch (InterruptedException | ExecutionException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }

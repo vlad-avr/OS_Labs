@@ -16,7 +16,9 @@ public class FunctionF extends Function {
             return res;
         }
         try {
-            Thread.sleep(rnd.nextInt(12000) + 6000);
+            int sleepTime = rnd.nextInt(12000) + 6000;
+            System.out.println("\n F(x) will compute for at least " + sleepTime + " ms");
+            Thread.sleep(sleepTime);
         } catch (InterruptedException exception) {
             res.status = Result.Status.FATAL_ERROR;
             res.attempts = 0;
@@ -29,7 +31,7 @@ public class FunctionF extends Function {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException exception) {
-                        res.attempts = i;
+                        res.attempts = i+1;
                         res.status = Result.Status.FATAL_ERROR;
                         return res;
                     }
@@ -37,7 +39,7 @@ public class FunctionF extends Function {
                 } else {
                     val = (int) Math.ceil(Math.sqrt((double) Math.abs(val)));
                     res.value = val;
-                    res.attempts = i;
+                    res.attempts = i+1;
                     res.status = Result.Status.MINOR_ERROR;
                     return res;
                 }

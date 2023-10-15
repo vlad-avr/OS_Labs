@@ -1,5 +1,4 @@
 package com.example;
-
 import com.example.control.Controller;
 
 // import java.io.IOException;
@@ -22,21 +21,5 @@ public final class App {
     public static void main(String[] args) {
         Controller controller = new Controller();
         controller.start();
-        // System.out.println("HELOO");
-        // try {
-        //     PipedOutputStream outStream = new PipedOutputStream(); 
-        //     PipedInputStream inputStream = new PipedInputStream(outStream);
-        //     ObjectOutputStream oos = new ObjectOutputStream(outStream);
-        //     ObjectInputStream ois = new ObjectInputStream(inputStream);
-        //     oos.writeObject("TEST");
-        //     System.out.println((String)ois.readObject());
-        //     ois.close();
-        // } catch (IOException e) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // } catch (ClassNotFoundException e) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // }
     }
 }
