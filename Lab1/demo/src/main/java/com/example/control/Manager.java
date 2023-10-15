@@ -23,14 +23,14 @@ public class Manager {
     private boolean isCancelled = false;
 
     public Manager() {
-        outputStreamF = new PipedOutputStream();
-        inputStreamF = new PipedInputStream();
-        outputStreamG = new PipedOutputStream();
-        inputStreamG = new PipedInputStream();
-        functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF);
-        functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
-        functionF.start();
-        functionG.start();
+        // outputStreamF = new PipedOutputStream();
+        // inputStreamF = new PipedInputStream();
+        // outputStreamG = new PipedOutputStream();
+        // inputStreamG = new PipedInputStream();
+        // functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF);
+        // functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
+        // functionF.start();
+        // functionG.start();
     }
 
     public void Done() {
@@ -63,10 +63,15 @@ public class Manager {
     }
 
     public void calculate(String value) {
-        if (isComputing) {
-            
-        }
         isComputing = true;
+        outputStreamF = new PipedOutputStream();
+        inputStreamF = new PipedInputStream();
+        outputStreamG = new PipedOutputStream();
+        inputStreamG = new PipedInputStream();
+        functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF);
+        functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
+        functionF.start();
+        functionG.start();
         putOutputToStream(value, outputStreamF);
         putOutputToStream(value, outputStreamG);
         Result resF = null;
@@ -102,6 +107,7 @@ public class Manager {
         } else {
             System.out.println("\n All computations have been cancelled by user : unable to compute GCD");
         }
+        System.out.println("DONE");
         isComputing = false;
         isCancelled = false;
     }

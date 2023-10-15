@@ -53,7 +53,6 @@ public class FunctionContainer extends Thread {
         try {
             ObjectOutputStream out = new ObjectOutputStream(outputStream);
             out.writeObject(output);
-            // out.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
