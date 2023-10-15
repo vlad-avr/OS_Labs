@@ -17,10 +17,14 @@ public class Manager {
     private PipedOutputStream outputStreamF;
     private PipedInputStream inputStreamG;
     private PipedOutputStream outputStreamG;
+    private PipedInputStream inputReportF;
+    private PipedInputStream inputReportG;
     private FunctionContainer functionF;
     private FunctionContainer functionG;
     public boolean isComputing = false;
     private boolean isCancelled = false;
+    private String reportF;
+    private String reportG;
 
     public Manager() {
         
@@ -28,6 +32,12 @@ public class Manager {
 
     public void Done() {
         FunctionContainer.allDone = true;
+    }
+
+    public void printReport(){
+        System.out.println("\nREPORT:\n");
+        System.out.println("Report on F(x) : " + reportF);
+        System.out.println("Report on G(x) : " + reportG);
     }
 
     public void cancel() {
@@ -61,8 +71,10 @@ public class Manager {
         inputStreamF = new PipedInputStream();
         outputStreamG = new PipedOutputStream();
         inputStreamG = new PipedInputStream();
-        functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF);
-        functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
+        inputReportF = new PipedInputStream();
+        inputReportG = new PipedInputStream();
+        functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF, inputReportF);
+        functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG, inputReportG);
         functionF.start();
         functionG.start();
         putOutputToStream(value, outputStreamF);
@@ -71,6 +83,12 @@ public class Manager {
         Result resG = null;
         while (!isCancelled) {
             try {
+                if(inputReportF.available() > 0){
+                    reportF = getInputFromStream(inputReportF);
+                }
+                if(inputReportG.available() > 0){
+                    reportG = getInputFromStream(inputReportG);
+                }
                 if (resF != null && resG != null) {
                     break;
                 }
@@ -88,6 +106,10 @@ public class Manager {
                 System.out.println(e.getMessage());
             }
         }
+        if(isCancelled){
+            reportF = "Computation was cancelled by user";
+            reportG = "Computation was cancelled by user";
+        }
         if (!isCancelled) {
             resF.show();
             resG.show();
@@ -100,7 +122,6 @@ public class Manager {
         } else {
             System.out.println("\n All computations have been cancelled by user : unable to compute GCD");
         }
-        System.out.println("DONE");
         isComputing = false;
         isCancelled = false;
     }

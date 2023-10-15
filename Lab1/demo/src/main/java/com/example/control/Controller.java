@@ -46,7 +46,8 @@ public class Controller {
                     }
                     break;
                 case "r":
-                    /* report */break;
+                    manager.printReport();
+                    break;
                 case "h":
                     help();
                     break;

@@ -1,13 +1,10 @@
 package com.example.func;
 
 public class FunctionG extends Function {
-    // public FunctionG(String input, int minorErrorAttempts) {
-    //     super(input, minorErrorAttempts);
-    // }
 
     public Result compute(String input, int minorErrorAttempts) {
         Result res = new Result();
-
+        container.putOutputToStream(res.getReport(), container.getReportStream());
         int val = 0;
         try {
             val = Integer.parseInt(input);
@@ -18,45 +15,70 @@ public class FunctionG extends Function {
         } catch (NumberFormatException exception) {
             res.attempts = 0;
             res.status = Result.Status.FATAL_ERROR;
+            container.putOutputToStream(res.getReport(), container.getReportStream());
             return res;
         }
-        try {
-            int sleepTime = rnd.nextInt(10000) + 5000;
-            System.out.println("\n G(x) will compute for at least " + sleepTime + " ms");
-            Thread.sleep(sleepTime);
-        } catch (InterruptedException exception) {
-            res.status = Result.Status.FATAL_ERROR;
-            res.attempts = 0;
-            return res;
-        }
+
+        int sleepTime = rnd.nextInt(10000) + 5000;
+        int allTime = sleepTime;
+        int i = 0;
+        System.out.println("\n G(x) will compute for at least " + sleepTime + " ms");
+
         if (val < 0) {
-            for (int i = 0; i < minorErrorAttempts; i++) {
+            for (; i < minorErrorAttempts; i++) {
                 int flip = rnd.nextInt(2);
                 if (flip == 0) {
                     try {
                         Thread.sleep(400);
+                        allTime += 400;
                     } catch (InterruptedException exception) {
-                        res.attempts = i+1;
+                        res.attempts = i + 1;
                         res.status = Result.Status.FATAL_ERROR;
+                        container.putOutputToStream(res.getReport(), container.getReportStream());
                         return res;
                     }
                     continue;
                 } else {
                     val = (int) Math.ceil(Math.log((double) Math.abs(val)));
                     res.value = val;
-                    res.attempts = i+1;
+                    res.attempts = i + 1;
                     res.status = Result.Status.MINOR_ERROR;
-                    return res;
+                    container.putOutputToStream(res.getReport(), container.getReportStream());
+                    break;
                 }
             }
-            res.attempts = minorErrorAttempts;
+            if (i >= minorErrorAttempts) {
+                res.attempts = minorErrorAttempts;
+                res.status = Result.Status.FATAL_ERROR;
+                container.putOutputToStream(res.getReport(), container.getReportStream());
+                return res;
+            }
+        }
+        try {
+            if (allTime <= maxTimeCount) {
+                Thread.sleep(sleepTime);
+                if (val < 0) {
+                    return res;
+                }
+            } else {
+                Thread.sleep(maxTimeCount);
+                res.status = Result.Status.FATAL_ERROR;
+                res.attempts = i;
+                container.putOutputToStream("Computation cancelled -> time limit reached",
+                        container.getReportStream());
+                return res;
+            }
+        } catch (InterruptedException exception) {
             res.status = Result.Status.FATAL_ERROR;
+            res.attempts = 0;
+            container.putOutputToStream(res.getReport(), container.getReportStream());
             return res;
         }
         val = (int) Math.ceil(Math.log((double) val));
         res.value = val;
         res.attempts = 1;
         res.status = Result.Status.SUCCESS;
+        container.putOutputToStream(res.getReport(), container.getReportStream());
         return res;
     }
 }

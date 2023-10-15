@@ -17,18 +17,27 @@ public class FunctionContainer extends Thread {
     private ExecutorService service = Executors.newSingleThreadExecutor();
     private PipedOutputStream outputStream;
     private PipedInputStream inputStream;
+    private PipedOutputStream outputReport;
     private int minorErrorAttempts;
     private String value;
     public static boolean allDone = false;
 
     public FunctionContainer(Function function, int minorErrorAttempts, PipedOutputStream fromManager,
-            PipedInputStream toManager) {
+            PipedInputStream toManager, PipedInputStream toReport) {
+
+        outputReport = new PipedOutputStream();
         outputStream = new PipedOutputStream();
         inputStream = new PipedInputStream();
         connectToOutputStream(toManager, outputStream);
         connectToOutputStream(inputStream, fromManager);
+        connectToOutputStream(toReport, outputReport);
         this.function = function;
+        this.function.setContainer(this);
         this.minorErrorAttempts = minorErrorAttempts;
+    }
+
+    public PipedOutputStream getReportStream() {
+        return this.outputReport;
     }
 
     public void connectToOutputStream(PipedInputStream inputStream, PipedOutputStream outputStream) {
@@ -39,7 +48,7 @@ public class FunctionContainer extends Thread {
         }
     }
 
-    public String getInputFromStream() {
+    public String getInputFromStream(PipedInputStream inputStream) {
         try {
             ObjectInputStream in = new ObjectInputStream(inputStream);
             return (String) in.readObject();
@@ -49,7 +58,7 @@ public class FunctionContainer extends Thread {
         }
     }
 
-    public void putOutputToStream(String output) {
+    public void putOutputToStream(String output, PipedOutputStream outputStream) {
         try {
             ObjectOutputStream out = new ObjectOutputStream(outputStream);
             out.writeObject(output);
@@ -80,18 +89,16 @@ public class FunctionContainer extends Thread {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-        value = getInputFromStream();
+        value = getInputFromStream(inputStream);
         Future<Result> result = compute();
         while (!result.isDone() && !result.isCancelled() && !allDone) {
             try {
                 if (inputStream.available() != 0) {
-                    String input = getInputFromStream();
+                    String input = getInputFromStream(inputStream);
                     switch (input) {
                         case "s":
                             result.cancel(true);
                             System.out.println("\nComputations canceled!");
-                            break;
-                        case "r": // report
                             break;
                     }
                 }
@@ -101,7 +108,7 @@ public class FunctionContainer extends Thread {
         }
         if (!result.isCancelled() && !allDone) {
             try {
-                putOutputToStream(result.get().toString());
+                putOutputToStream(result.get().toString(), outputStream);
             } catch (InterruptedException | ExecutionException e) {
                 System.out.println(e.getMessage());
             }

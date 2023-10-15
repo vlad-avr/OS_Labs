@@ -43,6 +43,24 @@ public class Result {
         this.functionName = functionName;
     }
 
+    public String getReport(){
+        if(status == null){
+            return "Computation is ongoing, no errors have occurred as of yet";
+        }else{
+            if(status == Result.Status.FATAL_ERROR){
+                return "Computation ended with " + status.toString() + " -> Unable to compute result in " + attempts + " attempts";
+            }else if(status == Result.Status.SUCCESS){
+                return "Computation ended with " + status.toString() + " -> Result is " + value + " | Attempts taken - " + attempts;
+            }else{
+                if(value == null){
+                    return status.toString() + " has occurred, computation is ongoing -> obtaining result is possible | Attempts taken so far - " + attempts;
+                }else{
+                    return "Computation ended with " + status.toString() + " -> minor errors have occurred during computation but result was obtained : " + value + " | Attempts taken - " + attempts;
+                }
+            }
+        }
+    }
+
     public String toString() {
         return status.toString() + "\t" + value + "\t" + attempts;
     }
