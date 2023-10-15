@@ -68,46 +68,42 @@ public class FunctionContainer extends Thread {
 
     @Override
     public void run() {
-        while (!allDone) {
+        try {
+            while (inputStream.available() == 0) {
+                if (allDone) {
+                    service.shutdown();
+                    return;
+                }
+                continue;
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        value = getInputFromStream();
+        Future<Result> result = compute();
+        while (!result.isDone() && !result.isCancelled() && !allDone) {
             try {
-                while (inputStream.available() == 0) {
-                    if (allDone) {
-                        service.shutdown();
-                        return;
+                if (inputStream.available() != 0) {
+                    String input = getInputFromStream();
+                    switch (input) {
+                        case "s":
+                            result.cancel(true);
+                            System.out.println("\nComputations canceled!");
+                            break;
+                        case "r": // report
+                            break;
                     }
-                    // System.out.println("NO INPUT");
-                    continue;
                 }
-            } catch (IOException e) {
+            } catch (IOException | CancellationException e) {
                 System.out.println(e.getMessage());
-                e.printStackTrace();
             }
-            value = getInputFromStream();
-            // System.out.println("\n" + value);
-            Future<Result> result = compute();
-            while (!result.isDone() && !result.isCancelled() && !allDone) {
-                try {
-                    if (inputStream.available() != 0) {
-                        String input = getInputFromStream();
-                        switch (input) {
-                            case "s":
-                                result.cancel(true);
-                                System.out.println("\nComputations canceled!");
-                                break;
-                            case "r": // report
-                                break;
-                        }
-                    }
-                } catch (IOException | CancellationException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-            if (!result.isCancelled() && !allDone) {
-                try {
-                    putOutputToStream(result.get().toString());
-                } catch (InterruptedException | ExecutionException e) {
-                    System.out.println(e.getMessage());
-                }
+        }
+        if (!result.isCancelled() && !allDone) {
+            try {
+                putOutputToStream(result.get().toString());
+            } catch (InterruptedException | ExecutionException e) {
+                System.out.println(e.getMessage());
             }
         }
         service.shutdown();

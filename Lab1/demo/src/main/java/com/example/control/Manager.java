@@ -23,14 +23,7 @@ public class Manager {
     private boolean isCancelled = false;
 
     public Manager() {
-        // outputStreamF = new PipedOutputStream();
-        // inputStreamF = new PipedInputStream();
-        // outputStreamG = new PipedOutputStream();
-        // inputStreamG = new PipedInputStream();
-        // functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF);
-        // functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
-        // functionF.start();
-        // functionG.start();
+        
     }
 
     public void Done() {
