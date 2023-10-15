@@ -5,11 +5,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.HashMap;
 
 import com.example.func.FunctionContainer;
 import com.example.func.FunctionF;
 import com.example.func.FunctionG;
 import com.example.func.Result;
+
+import javafx.util.Pair;
 
 public class Manager {
 
@@ -25,16 +28,17 @@ public class Manager {
     private boolean isCancelled = false;
     private String reportF;
     private String reportG;
+    private HashMap<String, Pair<Result, Result>> memo = new HashMap<>();
 
     public Manager() {
-        
+
     }
 
     public void Done() {
         FunctionContainer.allDone = true;
     }
 
-    public void printReport(){
+    public void printReport() {
         System.out.println("\nREPORT:\n");
         System.out.println("Report on F(x) : " + reportF);
         System.out.println("Report on G(x) : " + reportG);
@@ -67,46 +71,58 @@ public class Manager {
 
     public void calculate(String value) {
         isComputing = true;
-        outputStreamF = new PipedOutputStream();
-        inputStreamF = new PipedInputStream();
-        outputStreamG = new PipedOutputStream();
-        inputStreamG = new PipedInputStream();
-        inputReportF = new PipedInputStream();
-        inputReportG = new PipedInputStream();
-        functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF, inputReportF);
-        functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG, inputReportG);
-        functionF.start();
-        functionG.start();
-        putOutputToStream(value, outputStreamF);
-        putOutputToStream(value, outputStreamG);
         Result resF = null;
         Result resG = null;
-        while (!isCancelled) {
-            try {
-                if(inputReportF.available() > 0){
-                    reportF = getInputFromStream(inputReportF);
+        if (!memo.containsKey(value)) {
+            outputStreamF = new PipedOutputStream();
+            inputStreamF = new PipedInputStream();
+            outputStreamG = new PipedOutputStream();
+            inputStreamG = new PipedInputStream();
+            inputReportF = new PipedInputStream();
+            inputReportG = new PipedInputStream();
+            functionF = new FunctionContainer(new FunctionF(), 10, outputStreamF, inputStreamF, inputReportF);
+            functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG, inputReportG);
+            functionF.start();
+            functionG.start();
+            putOutputToStream(value, outputStreamF);
+            putOutputToStream(value, outputStreamG);
+            while (!isCancelled) {
+                try {
+                    if (inputReportF.available() > 0) {
+                        reportF = getInputFromStream(inputReportF);
+                    }
+                    if (inputReportG.available() > 0) {
+                        reportG = getInputFromStream(inputReportG);
+                    }
+                    if (resF != null && resG != null) {
+                        break;
+                    }
+                    if (inputStreamF.available() > 0) {
+                        String str = getInputFromStream(inputStreamF);
+                        resF = new Result(str);
+                        resF.setFunctionName("F(x)");
+                    }
+                    if (inputStreamG.available() > 0) {
+                        String str = getInputFromStream(inputStreamG);
+                        resG = new Result(str);
+                        resG.setFunctionName("G(x)");
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
-                if(inputReportG.available() > 0){
-                    reportG = getInputFromStream(inputReportG);
-                }
-                if (resF != null && resG != null) {
-                    break;
-                }
-                if (inputStreamF.available() > 0) {
-                    String str = getInputFromStream(inputStreamF);
-                    resF = new Result(str);
-                    resF.setFunctionName("F(x)");
-                }
-                if (inputStreamG.available() > 0) {
-                    String str = getInputFromStream(inputStreamG);
-                    resG = new Result(str);
-                    resG.setFunctionName("G(x)");
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
             }
+            if (!isCancelled) {
+                memo.put(value, new Pair<Result, Result>(resF, resG));
+            }
+        } else {
+            System.out.println("\nValue " + value + " has already been computed before");
+            reportF = "Computations weren`t needed -> result loaded from memoization map";
+            reportG = "Computations weren`t needed -> result loaded from memoization map";
+            Pair<Result, Result> results = memo.get(value);
+            resF = results.getKey();
+            resG = results.getValue();
         }
-        if(isCancelled){
+        if (isCancelled) {
             reportF = "Computation was cancelled by user";
             reportG = "Computation was cancelled by user";
         }
