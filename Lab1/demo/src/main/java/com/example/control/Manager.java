@@ -19,12 +19,10 @@ public class Manager {
     private PipedOutputStream outputStreamG;
     private FunctionContainer functionF;
     private FunctionContainer functionG;
-    private boolean isComputing = false;
+    public boolean isComputing = false;
     private boolean isCancelled = false;
-    private Controller controller;
 
-    public Manager(Controller controller) {
-        this.controller = controller;
+    public Manager() {
         outputStreamF = new PipedOutputStream();
         inputStreamF = new PipedInputStream();
         outputStreamG = new PipedOutputStream();
@@ -33,25 +31,9 @@ public class Manager {
         functionG = new FunctionContainer(new FunctionG(), 8, outputStreamG, inputStreamG);
         functionF.start();
         functionG.start();
-        //controller = new Controller(this);
     }
 
-    // public void start() {
-    // controller.start();
-    // await();
-    // }
-
-    // public void await() {
-    // while (!isDone) {
-    // if (isComputing) {
-    // calculate(controller.getValue());
-    // }
-    // }
-    // }
-
     public void Done() {
-        // functionF.stop();
-        // functionG.stop();
         FunctionContainer.allDone = true;
     }
 
@@ -60,13 +42,6 @@ public class Manager {
         putOutputToStream("s", outputStreamG);
         isCancelled = true;
     }
-
-    // public boolean isComputing() {
-    // return this.isComputing;
-    // }
-    // public void setComputing(){
-    // isComputing = true;
-    // }
 
     public void putOutputToStream(String output, PipedOutputStream outputStream) {
         try {
@@ -89,21 +64,16 @@ public class Manager {
 
     public void calculate(String value) {
         if (isComputing) {
-            System.out.println(
-                    "\nThere is an ongoing computation present right now. You can not start another one - cancel first!\n");
-            return;
+            
         }
+        isComputing = true;
         putOutputToStream(value, outputStreamF);
         putOutputToStream(value, outputStreamG);
         Result resF = null;
         Result resG = null;
-        InputThread inputThread = new InputThread(controller.getScanner(), this);
-        inputThread.start();
         while (!isCancelled) {
             try {
                 if (resF != null && resG != null) {
-                    inputThread.setDone();
-                    //inputThread.stop();
                     break;
                 }
                 if (inputStreamF.available() > 0) {
@@ -120,11 +90,6 @@ public class Manager {
                 System.out.println(e.getMessage());
             }
         }
-        if(inputThread.isAlive()){
-            System.out.println("iiiiiii");
-            inputThread.setDone();
-            inputThread.stop();
-        }
         if (!isCancelled) {
             resF.show();
             resG.show();
@@ -135,7 +100,7 @@ public class Manager {
                 System.out.println("\n GCD : " + GCD(resF.value, resG.value));
             }
         } else {
-            System.out.println("\n All computations have been cancelled by user : uable to compute GCD");
+            System.out.println("\n All computations have been cancelled by user : unable to compute GCD");
         }
         isComputing = false;
         isCancelled = false;

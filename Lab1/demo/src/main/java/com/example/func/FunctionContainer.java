@@ -86,7 +86,7 @@ public class FunctionContainer extends Thread {
             value = getInputFromStream();
             // System.out.println("\n" + value);
             Future<Result> result = compute();
-            while (!result.isDone() && !result.isCancelled()) {
+            while (!result.isDone() && !result.isCancelled() && !allDone) {
                 try {
                     if (inputStream.available() != 0) {
                         String input = getInputFromStream();
@@ -103,7 +103,7 @@ public class FunctionContainer extends Thread {
                     System.out.println(e.getMessage());
                 }
             }
-            if (!result.isCancelled()) {
+            if (!result.isCancelled() && !allDone) {
                 try {
                     putOutputToStream(result.get().toString());
                 } catch (InterruptedException | ExecutionException e) {
@@ -111,5 +111,6 @@ public class FunctionContainer extends Thread {
                 }
             }
         }
+        service.shutdown();
     }
 }
