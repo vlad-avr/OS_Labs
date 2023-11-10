@@ -1,70 +1,96 @@
 // Run() is called from Scheduling.main() and is where
 // the scheduling algorithm written by the user resides.
 // User modification should occur within the Run() function.
+
 package com.example.ontko;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Random;
 import java.io.*;
 
 public class SchedulingAlgorithm {
+  PrintStream out;
+  ArrayList<sProcess> processes;
+  sProcess process = null;
+  ArrayList<sProcess> tickets = new ArrayList<>();
+  int maxTimeQuantumSize = 50; // ms
+  /**
+   * break quantum if process is blocked or completed
+   */
+  boolean breakQuantums = true;
 
-  public static Results Run(int runtime, Vector processVector, Results result) {
-    int i = 0;
-    int comptime = 0;
-    int currentProcess = 0;
-    int previousProcess = 0;
-    int size = processVector.size();
-    int completed = 0;
-    String resultsFile = "Summary-Processes";
-
-    result.schedulingType = "Batch (Nonpreemptive)";
-    result.schedulingName = "First-Come First-Served"; 
+  public SchedulingAlgorithm(ArrayList<sProcess> processes) {
+    String resultsFile = "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\ontko\\Summary-Processes";
     try {
-      //BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));
-      //OutputStream out = new FileOutputStream(resultsFile);
-      PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
-      sProcess process = (sProcess) processVector.elementAt(currentProcess);
-      out.println("Process: " + currentProcess + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-      while (comptime < runtime) {
-        if (process.cpudone == process.cputime) {
-          completed++;
-          out.println("Process: " + currentProcess + " completed... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-          if (completed == size) {
-            result.compuTime = comptime;
-            out.close();
-            return result;
-          }
-          for (i = size - 1; i >= 0; i--) {
-            process = (sProcess) processVector.elementAt(i);
-            if (process.cpudone < process.cputime) { 
-              currentProcess = i;
-            }
-          }
-          process = (sProcess) processVector.elementAt(currentProcess);
-          out.println("Process: " + currentProcess + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-        }      
-        if (process.ioblocking == process.ionext) {
-          out.println("Process: " + currentProcess + " I/O blocked... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-          process.numblocked++;
-          process.ionext = 0; 
-          previousProcess = currentProcess;
-          for (i = size - 1; i >= 0; i--) {
-            process = (sProcess) processVector.elementAt(i);
-            if (process.cpudone < process.cputime && previousProcess != i) { 
-              currentProcess = i;
-            }
-          }
-          process = (sProcess) processVector.elementAt(currentProcess);
-          out.println("Process: " + currentProcess + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-        }        
-        process.cpudone++;       
-        if (process.ioblocking > 0) {
-          process.ionext++;
-        }
-        comptime++;
+      out = new PrintStream(new FileOutputStream(resultsFile));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    this.processes = processes;
+    for (sProcess p : processes) {
+      for (int i = 0; i < p.weight; i += 1) {
+        tickets.add(p);
       }
-      out.close();
-    } catch (IOException e) { /* Handle exceptions */ }
+    }
+  }
+
+  /**
+   * Print process status
+   */
+  void print(String state) {
+    String line = String.format("Process %d: %s (%s)", process.index, state, process);
+    out.println(line);
+  }
+
+  /**
+   * Select next process
+   * @return size of the next quantum
+   */
+  public void elect() {
+    int i = new Random().nextInt(tickets.size());
+    process = tickets.get(i);
+    print("registered");
+  }
+
+  public Results run(int runtime, Results result) {
+    result.schedulingType = "Preemptive";
+    result.schedulingName = "Lottery";
+
+    int completed = 0;
+    int comptime = 0;
+    int timeQuantum;
+    for (; comptime <= runtime; comptime += timeQuantum) {
+      elect();
+
+      int timeToComplete = process.timeToComplete();
+      int timeToIOBreak = process.timeToIOBreak();
+
+      if (breakQuantums) {
+        timeQuantum = Math.min(maxTimeQuantumSize, Math.min(timeToComplete, timeToIOBreak));
+      } else {
+        timeQuantum = maxTimeQuantumSize;
+      }
+      process.proceed(timeQuantum);
+
+      if (timeToComplete <= timeQuantum) {
+        completed++;
+        print("completed");
+        if (completed == processes.size()) {
+          result.compuTime = comptime;
+          return result;
+        }
+        // remove all process's tickets
+        while(tickets.remove(process)) {}
+      }
+
+      if (timeToIOBreak <= timeQuantum) {
+        print("I/O blocked");
+        process.numblocked += 1;
+        process.ionext = 0;
+      }
+    }
+
     result.compuTime = comptime;
     return result;
   }

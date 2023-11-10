@@ -1,5 +1,3 @@
-package com.example.ontko;
-
 public class Results {
   public String schedulingType;
   public String schedulingName;

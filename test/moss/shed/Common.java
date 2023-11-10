@@ -1,5 +1,3 @@
-package com.example.ontko;
-
 public class Common {
 
   static public int s2i (String s) {
@@ -55,3 +53,4 @@ public class Common {
   }
 
 }
+
