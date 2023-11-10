@@ -1,3 +1,5 @@
+package com.example.scheduling;
+
 // This file contains the main() function for the Scheduling
 // simulation.  Init() initializes most of the variables by
 // reading from a provided file.  SchedulingAlgorithm.Run() is
@@ -9,10 +11,10 @@
 
 import java.io.*;
 import java.util.*;
-import sProcess;
-import Common;
-import Results;
-import SchedulingAlgorithm;
+// import sProcess;
+// import Common;
+// import Results;
+// import SchedulingAlgorithm;
 
 public class Scheduling {
 

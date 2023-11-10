@@ -1,3 +1,5 @@
+package com.example.scheduling;
+
 public class sProcess {
   public int cputime;
   public int ioblocking;
