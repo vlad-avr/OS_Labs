@@ -24,7 +24,7 @@ public class Scheduling {
   private static int runtime = 1000;
   private static List<sProcess> processList = new ArrayList<>();
   private static Results result = new Results("null", "null", 0);
-  private static String resultsFile = "Summary-Results";
+  private static String resultsFile = "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\scheduling\\Summary-Results";
 
   private static void Init(String file) {
     File f = new File(file);
@@ -98,7 +98,7 @@ public class Scheduling {
     //   System.out.println("Usage: 'java Scheduling <INIT FILE>'");
     //   System.exit(-1);
     // }
-    String filepath = "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\ontko\\scheduling.conf";
+    String filepath = "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\scheduling\\scheduling.conf";
     File f = new File(filepath);
     if (!(f.exists())) {
       System.out.println("Scheduling: error, file '" + f.getName() + "' does not exist.");

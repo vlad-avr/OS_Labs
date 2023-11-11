@@ -17,10 +17,10 @@ public class SchedulingAlgorithm {
     int previousProcess = 0;
     int size = processVector.size();
     int completed = 0;
-    String resultsFile = "Summary-Processes";
+    String resultsFile = "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\scheduling\\Summary-Processes";
 
     result.schedulingType = "Batch (Nonpreemptive)";
-    result.schedulingName = "First-Come First-Served"; 
+    result.schedulingName = "Fair-Share"; 
     try {
       //BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));
       //OutputStream out = new FileOutputStream(resultsFile);
