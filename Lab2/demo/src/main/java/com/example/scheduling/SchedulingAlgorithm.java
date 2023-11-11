@@ -29,12 +29,9 @@ public class SchedulingAlgorithm {
   }
 
   public Results run() {
-    // int i = 0;
     int comptime = 0;
     int currentProcessId = 0;
-    // int previousProcess = 0;
-    // int size = processes.size();
-    // int completed = 0;
+    boolean isCompleted = false;
     result.schedulingType = "Preemptive";
     result.schedulingName = "Fair-Share";
     while (comptime < runtime && !processes.isEmpty()) {
@@ -48,23 +45,31 @@ public class SchedulingAlgorithm {
         if (currentProcess.cpudone == currentProcess.cputime) {
           out.println("Process: " + currentProcess.id + " completed (" + currentProcess.toString() + ")");
           processes.remove(currentProcessId);
+          if(currentProcessId == processes.size()){
+            currentProcessId = 0;
+          }
+          isCompleted = true;
           i = currentProcess.priority;
           continue;
-        }else{
-          if(timeToIOBlock <= elapsedTime){
+        } else {
+          if (timeToIOBlock <= elapsedTime) {
             out.println("Process: " + currentProcess.id + " I/O blocked (" + currentProcess.toString() + ")");
             currentProcess.numblocked++;
             currentProcess.ionext = 0;
-          }else{
-            out.println("Process: " + currentProcess.id + " blocked (exceeded quantum) (" + currentProcess.toString() + ")");
+          } else {
+            out.println(
+                "Process: " + currentProcess.id + " blocked (exceeded quantum) (" + currentProcess.toString() + ")");
           }
         }
         comptime += elapsedTime;
       }
-      if(processes.size() > 0){
+      if (!isCompleted) {
         currentProcessId = (currentProcessId + 1) % processes.size();
-      }else{
-        break;
+      } else {
+        if (processes.isEmpty()) {
+          break;
+        }
+        isCompleted = false;
       }
     }
 
