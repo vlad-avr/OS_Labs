@@ -130,7 +130,7 @@ public class Scheduling {
       }
     }
     SchedulingAlgorithm scheduler = new SchedulingAlgorithm(processList, runtime, result);
-    result = scheduler.run(runtime, processList, result);
+    result = scheduler.run();
     try {
       // BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));
       PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
