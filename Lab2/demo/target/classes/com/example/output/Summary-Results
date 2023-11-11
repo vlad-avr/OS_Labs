@@ -1,6 +1,6 @@
 Scheduling Type: Preemptive
 Scheduling Name: Fair-Share
-Simulation Run Time: 2900
+Simulation Run Time: 3430
 Mean: 1100
 Standard Deviation: 510
 Process	CPU Time	IO Blocking	CPU Completed	CPU Blocked

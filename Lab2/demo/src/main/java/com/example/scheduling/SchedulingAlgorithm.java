@@ -14,7 +14,7 @@ public class SchedulingAlgorithm {
   private List<sProcess> processes;
   private int runtime;
   private Results result;
-  private final int quantum = 50;
+  private final int quantum = 250;
 
   public SchedulingAlgorithm(List<sProcess> processes, int runtime, Results result) {
     this.processes = processes;
