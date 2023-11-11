@@ -99,11 +99,6 @@ public class Scheduling {
 
   public static void main(String[] args) {
     int i = 0;
-
-    // if (args.length != 1) {
-    //   System.out.println("Usage: 'java Scheduling <INIT FILE>'");
-    //   System.exit(-1);
-    // }
     String filepath = "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\scheduling\\scheduling.conf";
     File f = new File(filepath);
     if (!(f.exists())) {

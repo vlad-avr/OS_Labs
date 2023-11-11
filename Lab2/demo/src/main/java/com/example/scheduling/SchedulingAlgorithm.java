@@ -72,48 +72,7 @@ public class SchedulingAlgorithm {
         isCompleted = false;
       }
     }
-
-    // while (comptime < runtime) {
-    // if (process.cpudone == process.cputime) {
-    // completed++;
-
-    // if (completed == size) {
-    // result.compuTime = comptime;
-    // out.close();
-    // return result;
-    // }
-    // for (i = size - 1; i >= 0; i--) {
-    // process = processes.get(i);
-    // if (process.cpudone < process.cputime) {
-    // currentProcess = i;
-    // }
-    // }
-    // process = (sProcess) processes.get(currentProcess);
-    // out.println("Process: " + currentProcess + " registered... (" +
-    // process.toString() + ")");
-    // }
-    // if (process.ioblocking == process.ionext) {
-    // out.println("Process: " + currentProcess + " I/O blocked... (" +
-    // process.toString() + ")");
-    // process.numblocked++;
-    // process.ionext = 0;
-    // previousProcess = currentProcess;
-    // for (i = size - 1; i >= 0; i--) {
-    // process = (sProcess) processes.get(i);
-    // if (process.cpudone < process.cputime && previousProcess != i) {
-    // currentProcess = i;
-    // }
-    // }
-    // process = (sProcess) processes.get(currentProcess);
-    // out.println("Process: " + currentProcess + " registered... (" +
-    // process.toString() + ")");
-    // }
-    // process.cpudone++;
-    // if (process.ioblocking > 0) {
-    // process.ionext++;
-    // }
-    // comptime++;
-    // }
+    
     out.close();
     result.compuTime = comptime;
     return result;
