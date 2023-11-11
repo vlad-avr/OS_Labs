@@ -17,5 +17,14 @@ public class sProcess {
     this.ionext = ionext;
     this.numblocked = numblocked;
     this.priority = priority;
-  } 	
+  }
+  
+  public String toString() {
+    return String.format("done: %d/%d, I/O blocks: %d, I/O interval: %d", cpudone, cputime, numblocked, ioblocking);
+  }
+
+  public void addTime(int time) {
+    cpudone += time;
+    ionext += time;
+  }
 }

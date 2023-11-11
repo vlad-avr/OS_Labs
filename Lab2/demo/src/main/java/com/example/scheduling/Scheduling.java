@@ -129,7 +129,8 @@ public class Scheduling {
         i++;
       }
     }
-    result = SchedulingAlgorithm.Run(runtime, processList, result);
+    SchedulingAlgorithm scheduler = new SchedulingAlgorithm(processList, runtime, result);
+    result = scheduler.run(runtime, processList, result);
     try {
       // BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));
       PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
