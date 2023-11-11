@@ -68,7 +68,7 @@ public class Scheduling {
           }catch(NumberFormatException e){
             e.printStackTrace();
           }
-          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0, priority));
+          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0, priority, processList.size()));
         }
         if (line.startsWith("runtime")) {
           StringTokenizer st = new StringTokenizer(line);
@@ -125,7 +125,7 @@ public class Scheduling {
         }
         X = X * runTimeStdDev;
         int cputime = (int) X + runTimeAverage;
-        processList.add(new sProcess(cputime, i * 100, 0, 0, 0, 1));
+        processList.add(new sProcess(cputime, i * 100, 0, 0, 0, 1, processList.size()));
         i++;
       }
     }
@@ -139,7 +139,7 @@ public class Scheduling {
       out.println("Simulation Run Time: " + result.compuTime);
       out.println("Mean: " + runTimeAverage);
       out.println("Standard Deviation: " + runTimeStdDev);
-      out.println("Process #\tCPU Time\tIO Blocking\tCPU Completed\tCPU Blocked");
+      out.println("Process\tCPU Time\tIO Blocking\tCPU Completed\tCPU Blocked");
       for (i = 0; i < processList.size(); i++) {
         sProcess process = (sProcess) processList.get(i);
         out.print(Integer.toString(i));
@@ -170,7 +170,8 @@ public class Scheduling {
       }
       out.close();
     } catch (IOException e) {
-      /* Handle exceptions */ }
+      System.out.println(e.getMessage());
+    }
     System.out.println("Completed.");
   }
 }
