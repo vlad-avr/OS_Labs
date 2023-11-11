@@ -19,8 +19,8 @@ import java.util.*;
 public class Scheduling {
 
   private static int processnum = 5;
-  private static int meanDev = 1000;
-  private static int standardDev = 100;
+  private static int runTimeAverage = 1000;
+  private static int runTimeStdDev = 100;
   private static int runtime = 1000;
   private static List<sProcess> processList = new ArrayList<>();
   private static Results result = new Results("null", "null", 0);
@@ -45,12 +45,12 @@ public class Scheduling {
         if (line.startsWith("meandev")) {
           StringTokenizer st = new StringTokenizer(line);
           st.nextToken();
-          meanDev = Common.s2i(st.nextToken());
+          runTimeAverage = Common.s2i(st.nextToken());
         }
         if (line.startsWith("standdev")) {
           StringTokenizer st = new StringTokenizer(line);
           st.nextToken();
-          standardDev = Common.s2i(st.nextToken());
+          runTimeStdDev = Common.s2i(st.nextToken());
         }
         if (line.startsWith("process")) {
           StringTokenizer st = new StringTokenizer(line);
@@ -60,9 +60,15 @@ public class Scheduling {
           while (X == -1.0) {
             X = Common.R1();
           }
-          X = X * standardDev;
-          cputime = (int) X + meanDev;
-          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0));
+          X = X * runTimeStdDev;
+          cputime = (int) X + runTimeAverage;
+          int priority = 1;
+          try{
+            priority = Integer.parseInt(st.nextToken().trim());
+          }catch(NumberFormatException e){
+            e.printStackTrace();
+          }
+          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0, priority));
         }
         if (line.startsWith("runtime")) {
           StringTokenizer st = new StringTokenizer(line);
@@ -117,9 +123,9 @@ public class Scheduling {
         while (X == -1.0) {
           X = Common.R1();
         }
-        X = X * standardDev;
-        int cputime = (int) X + meanDev;
-        processList.add(new sProcess(cputime, i * 100, 0, 0, 0));
+        X = X * runTimeStdDev;
+        int cputime = (int) X + runTimeAverage;
+        processList.add(new sProcess(cputime, i * 100, 0, 0, 0, 1));
         i++;
       }
     }
@@ -130,8 +136,8 @@ public class Scheduling {
       out.println("Scheduling Type: " + result.schedulingType);
       out.println("Scheduling Name: " + result.schedulingName);
       out.println("Simulation Run Time: " + result.compuTime);
-      out.println("Mean: " + meanDev);
-      out.println("Standard Deviation: " + standardDev);
+      out.println("Mean: " + runTimeAverage);
+      out.println("Standard Deviation: " + runTimeStdDev);
       out.println("Process #\tCPU Time\tIO Blocking\tCPU Completed\tCPU Blocked");
       for (i = 0; i < processList.size(); i++) {
         sProcess process = (sProcess) processList.get(i);
