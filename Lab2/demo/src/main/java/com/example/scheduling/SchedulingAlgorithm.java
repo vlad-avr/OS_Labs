@@ -15,6 +15,7 @@ public class SchedulingAlgorithm {
   private int runtime;
   private Results result;
   private final int quantum = 250;
+  private final int skipQuantum = 20;
 
   public SchedulingAlgorithm(List<sProcess> processes, int runtime, Results result) {
     this.processes = processes;
@@ -40,7 +41,13 @@ public class SchedulingAlgorithm {
 
       currentProcess = processes.get(currentProcessId);
       if(currentProcess.IOblocked){
-        fairnessCounter = currentProcess.priority;
+        currentProcess.DecreaseWait(skipQuantum);
+        out.println("Process: " + currentProcess.id + " is still blocked (skipped)");
+        for(sProcess p : processes){
+          if(p.IOblocked && p.id != currentProcessId){
+            p.DecreaseWait(skipQuantum);
+          }
+        }
         continue;
       }
       out.println("Process: " + currentProcess.id + " registered (" + currentProcess.toString() + ")");
@@ -61,6 +68,7 @@ public class SchedulingAlgorithm {
         if (timeToIOBlock <= elapsedTime) {
           out.println("Process: " + currentProcess.id + " I/O blocked (" + currentProcess.toString() + ")");
           currentProcess.numblocked++;
+          currentProcess.IOblocked = true;
           currentProcess.ionext = 0;
         } else {
           out.println(
@@ -81,11 +89,7 @@ public class SchedulingAlgorithm {
       }
       for(sProcess p : processes){
         if(p.IOblocked){
-          p.timeToIOBlockEnd -= elapsedTime;
-          if(p.timeToIOBlockEnd <= 0){
-          p.timeToIOBlockEnd = p.IOBlockedTime;
-          p.IOblocked = false;
-        }
+          p.DecreaseWait(elapsedTime);
         }
       }
     }

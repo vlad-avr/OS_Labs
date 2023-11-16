@@ -52,4 +52,12 @@ public class sProcess {
   public int timeToIOBlock(){
     return ioblocking - ionext;
   }
+
+  public void DecreaseWait(int s) {
+    timeToIOBlockEnd -= s;
+    if(timeToIOBlockEnd <= 0){
+      IOblocked = false;
+      timeToIOBlockEnd = IOBlockedTime;
+    }
+  }
 }
