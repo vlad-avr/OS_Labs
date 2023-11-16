@@ -42,6 +42,8 @@ public class SchedulingAlgorithm {
       currentProcess = processes.get(currentProcessId);
       if(currentProcess.IOblocked){
         currentProcess.DecreaseWait(skipQuantum);
+        currentProcessId = (currentProcessId + 1) % processes.size();
+        fairnessCounter = 0;
         out.println("Process: " + currentProcess.id + " is still blocked (skipped)");
         for(sProcess p : processes){
           if(p.IOblocked && p.id != currentProcessId){
