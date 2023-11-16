@@ -39,6 +39,10 @@ public class SchedulingAlgorithm {
     while (comptime < runtime && !processes.isEmpty()) {
 
       currentProcess = processes.get(currentProcessId);
+      if(currentProcess.IOblocked){
+        fairnessCounter = currentProcess.priority;
+        continue;
+      }
       out.println("Process: " + currentProcess.id + " registered (" + currentProcess.toString() + ")");
 
       int timeToIOBlock = currentProcess.timeToIOBlock();
@@ -73,6 +77,15 @@ public class SchedulingAlgorithm {
       } else {
         if (processes.isEmpty()) {
           break;
+        }
+      }
+      for(sProcess p : processes){
+        if(p.IOblocked){
+          p.timeToIOBlockEnd -= elapsedTime;
+          if(p.timeToIOBlockEnd <= 0){
+          p.timeToIOBlockEnd = p.IOBlockedTime;
+          p.IOblocked = false;
+        }
         }
       }
     }

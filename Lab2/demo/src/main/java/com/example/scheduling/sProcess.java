@@ -11,6 +11,12 @@ public class sProcess {
   public int ionext;
   //Number of times blocked
   public int numblocked;
+  //Time of blocking for IO
+  public int IOBlockedTime;
+  //Time of blocking for IO left
+  public int timeToIOBlockEnd;
+  //Process is blocked for IO
+  public boolean IOblocked = false;
 
   //priority
   public int priority;
@@ -18,7 +24,7 @@ public class sProcess {
   //process id
   public int id;
 
-  public sProcess (int cputime, int ioblocking, int cpudone, int ionext, int numblocked, int priority, int id) {
+  public sProcess (int cputime, int ioblocking, int cpudone, int ionext, int numblocked, int priority, int id, int IOBlockedTime) {
     this.cputime = cputime;
     this.ioblocking = ioblocking;
     this.cpudone = cpudone;
@@ -26,6 +32,8 @@ public class sProcess {
     this.numblocked = numblocked;
     this.priority = priority;
     this.id = id;
+    this.IOBlockedTime = IOBlockedTime;
+    this.timeToIOBlockEnd = IOBlockedTime;
   }
   
   public String toString() {

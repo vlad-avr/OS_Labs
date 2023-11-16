@@ -63,12 +63,14 @@ public class Scheduling {
           X = X * runTimeStdDev;
           cputime = (int) X + runTimeAverage;
           int priority = 1;
+          int IOBlockedTime = 0;
           try{
             priority = Integer.parseInt(st.nextToken().trim());
+            IOBlockedTime = Integer.parseInt(st.nextToken().trim());
           }catch(NumberFormatException e){
             e.printStackTrace();
           }
-          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0, priority, processList.size()));
+          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0, priority, processList.size(), IOBlockedTime));
         }
         if (line.startsWith("runtime")) {
           StringTokenizer st = new StringTokenizer(line);
@@ -106,7 +108,7 @@ public class Scheduling {
         }
         X = X * runTimeStdDev;
         int cputime = (int) X + runTimeAverage;
-        processList.add(new sProcess(cputime, i * 100, 0, 0, 0, 1, processList.size()));
+        processList.add(new sProcess(cputime, i * 100, 0, 0, 0, 1, processList.size(), 0));
         i++;
       }
     }
