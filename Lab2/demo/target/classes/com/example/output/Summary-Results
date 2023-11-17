@@ -4,4 +4,4 @@ Simulation Run Time: 0
 Mean: 1100
 Standard Deviation: 510
 Process	CPU Time	IO Blocking	CPU Completed	CPU Blocked
-0		618 (ms)	100 (ms)	618 (ms)	3 times
+0		616 (ms)	100 (ms)	616 (ms)	6 times

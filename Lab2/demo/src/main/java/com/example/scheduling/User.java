@@ -8,6 +8,7 @@ public class User {
     public int processNum;
     public int weight;
     public String name;
+    public int curProcessId = 0;
     public User(int processNum, int weight, String name){
         this.weight = weight;
         this.processNum = processNum;

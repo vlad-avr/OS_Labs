@@ -123,9 +123,11 @@ public class Scheduling {
         i++;
       }
     }
+    int j = 0;
     for(User user : userList){
-      for(int j = 0; j < processList.size(); j++){
+      for(int k = 0; k < user.processNum; k++){
         user.processes.add(processList.get(j));
+        j++;
       }
     } 
 

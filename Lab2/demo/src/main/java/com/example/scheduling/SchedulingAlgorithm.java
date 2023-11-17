@@ -48,9 +48,9 @@ public class SchedulingAlgorithm {
       if(curUser.processes.size() == 0){
         continue;
       }
-      int j = 0;
-      for(int i = 0; i < curUser.weight; j++){
-        sProcess process = curUser.processes.get(j % curUser.processes.size());
+      for(int i = 0; i < curUser.weight; curUser.curProcessId++){
+        curUser.curProcessId = curUser.curProcessId % curUser.processes.size();
+        sProcess process = curUser.processes.get(curUser.curProcessId);
         if(process.IOblocked){
           out.println("Process: " + process.id + " held by " + curUser.name + " is still IOblocked (skipped)");
           if(quantumLeft <= skipQuantum){
@@ -74,14 +74,12 @@ public class SchedulingAlgorithm {
         int elapsedTime = Math.min(quantumLeft, Math.min(process.timeToComplete(), process.timeToIOBlock()));
         process.addTime(elapsedTime);
         if(quantumLeft == elapsedTime){
-          process.addTime(quantumLeft);
           out.println(
               "Process: " + process.id + " held by " + curUser.name + " blocked (exceeded quantum) (" + process.toString() + ")");
           quantumLeft = maxQuantum;
           i++;
         }else if(process.timeToIOBlock() == elapsedTime){
           quantumLeft -= process.timeToIOBlock();
-          process.addTime(process.timeToIOBlock());
           out.println("Process: " + process.id + " held by " + curUser.name + " I/O blocked (" + process.toString() + ")");
           process.numblocked++;
           process.IOblocked = true;
@@ -93,14 +91,17 @@ public class SchedulingAlgorithm {
           if(curUser.processes.size() == 0){
             break;
           }
-          if(j == curUser.processes.size()){
-            j = -1;
+          if(curUser.curProcessId == curUser.processes.size()){
+            curUser.curProcessId = -1;
           }
         }
-        currentUserID = (currentUserID+1)%users.size();
       }
+      currentUserID = (currentUserID+1)%users.size();
       if(curUser.processes.size() == 0){
         users.remove(curUser);
+        if(currentUserID == users.size()){
+          currentUserID = 0;
+        }
       }
     }
 
