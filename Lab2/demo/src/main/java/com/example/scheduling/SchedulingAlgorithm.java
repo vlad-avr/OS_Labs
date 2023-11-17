@@ -15,7 +15,7 @@ public class SchedulingAlgorithm {
   private List<User> users;
   private int runtime;
   private Results result;
-  private final int maxQuantum = 250;
+  private final int maxQuantum = 50;
   private final int skipQuantum = 20;
 
   public SchedulingAlgorithm(List<User> users, int runtime, Results result) {
@@ -44,6 +44,7 @@ public class SchedulingAlgorithm {
     result.schedulingType = "Preemptive";
     result.schedulingName = "Fair-Share";
     while (comptime < runtime && !users.isEmpty()) {
+      currentUserID = (currentUserID+1)%users.size();
       curUser = users.get(currentUserID);
       if(curUser.processes.size() == 0){
         continue;
@@ -59,9 +60,13 @@ public class SchedulingAlgorithm {
           }else{
             quantumLeft -= skipQuantum;
           }
-          for(sProcess blockedProcess : blockedProcesses){
+          int cSize = blockedProcesses.size();
+          for(int k = 0; k < cSize; k++){
+            sProcess blockedProcess = blockedProcesses.get(i);
             if(blockedProcess.DecreaseWait(skipQuantum)){
               blockedProcesses.remove(blockedProcess);
+              k--;
+              cSize--;
             }
           }
           continue;
@@ -79,6 +84,7 @@ public class SchedulingAlgorithm {
           process.addTime(timeToIOBlock);
           out.println("Process: " + process.id + " held by " + curUser.name + " I/O blocked (" + process.toString() + ")");
           process.IOblocked = true;
+          blockedProcesses.add(process);
         }
 
         if(process.cpudone == process.cputime){
@@ -93,62 +99,6 @@ public class SchedulingAlgorithm {
         }
 
       }
-
-      // curUser = users.get(currentUserID);
-      // if(curUser.IOblocked){
-      //   curUser.DecreaseWait(skipQuantum);
-      //   currentUserID = (currentUserID + 1) % users.size();
-      //   fairnessCounter = 0;
-      //   out.println("Process: " + curUser.id + " is still blocked (skipped)");
-      //   for(sProcess p : users){
-      //     if(p.IOblocked && p.id != currentUserID){
-      //       p.DecreaseWait(skipQuantum);
-      //     }
-      //   }
-      //   continue;
-      // }
-      // out.println("Process: " + curUser.id + " registered (" + curUser.toString() + ")");
-
-      // int timeToIOBlock = curUser.timeToIOBlock();
-      // int elapsedTime = Math.min(quantum, Math.min(curUser.timeToComplete(), timeToIOBlock));
-      // curUser.addTime(elapsedTime);
-
-      // if (curUser.cpudone == curUser.cputime) {
-      //   out.println("Process: " + curUser.id + " completed (" + curUser.toString() + ")");
-      //   users.remove(currentUserID);
-      //   if (currentUserID == users.size()) {
-      //     currentUserID = 0;
-      //   }
-      //   curUser = null;
-      //   continue;
-      // } else {
-      //   if (timeToIOBlock <= elapsedTime) {
-      //     out.println("Process: " + curUser.id + " I/O blocked (" + curUser.toString() + ")");
-      //     curUser.numblocked++;
-      //     curUser.IOblocked = true;
-      //     curUser.ionext = 0;
-      //   } else {
-      //     out.println(
-      //         "Process: " + curUser.id + " blocked (exceeded quantum) (" + curUser.toString() + ")");
-      //   }
-      // }
-
-      // comptime += elapsedTime;
-      // fairnessCounter++;
-
-      // if (curUser != null && fairnessCounter == curUser.priority) {
-      //   currentUserID = (currentUserID + 1) % users.size();
-      //   fairnessCounter = 0;
-      // } else {
-      //   if (users.isEmpty()) {
-      //     break;
-      //   }
-      // }
-      // for(sProcess p : users){
-      //   if(p.IOblocked){
-      //     p.DecreaseWait(elapsedTime);
-      //   }
-      // }
     }
 
     out.close();
