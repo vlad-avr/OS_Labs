@@ -18,19 +18,15 @@ public class sProcess {
   //Process is blocked for IO
   public boolean IOblocked = false;
 
-  //priority
-  public int priority;
-
   //process id
   public int id;
 
-  public sProcess (int cputime, int ioblocking, int cpudone, int ionext, int numblocked, int priority, int id, int IOBlockedTime) {
+  public sProcess (int cputime, int ioblocking, int cpudone, int ionext, int numblocked, int id, int IOBlockedTime) {
     this.cputime = cputime;
     this.ioblocking = ioblocking;
     this.cpudone = cpudone;
     this.ionext = ionext;
     this.numblocked = numblocked;
-    this.priority = priority;
     this.id = id;
     this.IOBlockedTime = IOBlockedTime;
     this.timeToIOBlockEnd = IOBlockedTime;

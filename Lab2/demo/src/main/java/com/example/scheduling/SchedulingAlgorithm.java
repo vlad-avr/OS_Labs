@@ -11,14 +11,14 @@ import java.io.*;
 public class SchedulingAlgorithm {
 
   private PrintStream out;
-  private List<sProcess> processes;
+  private List<User> users;
   private int runtime;
   private Results result;
   private final int quantum = 250;
   private final int skipQuantum = 20;
 
-  public SchedulingAlgorithm(List<sProcess> processes, int runtime, Results result) {
-    this.processes = processes;
+  public SchedulingAlgorithm(List<User> users, int runtime, Results result) {
+    this.users = users;
     this.runtime = runtime;
     this.result = result;
     try {
@@ -37,15 +37,15 @@ public class SchedulingAlgorithm {
     // boolean isCompleted = false;
     result.schedulingType = "Preemptive";
     result.schedulingName = "Fair-Share";
-    while (comptime < runtime && !processes.isEmpty()) {
+    while (comptime < runtime && !users.isEmpty()) {
 
-      currentProcess = processes.get(currentProcessId);
+      currentProcess = users.get(currentProcessId);
       if(currentProcess.IOblocked){
         currentProcess.DecreaseWait(skipQuantum);
-        currentProcessId = (currentProcessId + 1) % processes.size();
+        currentProcessId = (currentProcessId + 1) % users.size();
         fairnessCounter = 0;
         out.println("Process: " + currentProcess.id + " is still blocked (skipped)");
-        for(sProcess p : processes){
+        for(sProcess p : users){
           if(p.IOblocked && p.id != currentProcessId){
             p.DecreaseWait(skipQuantum);
           }
@@ -60,8 +60,8 @@ public class SchedulingAlgorithm {
 
       if (currentProcess.cpudone == currentProcess.cputime) {
         out.println("Process: " + currentProcess.id + " completed (" + currentProcess.toString() + ")");
-        processes.remove(currentProcessId);
-        if (currentProcessId == processes.size()) {
+        users.remove(currentProcessId);
+        if (currentProcessId == users.size()) {
           currentProcessId = 0;
         }
         currentProcess = null;
@@ -82,14 +82,14 @@ public class SchedulingAlgorithm {
       fairnessCounter++;
 
       if (currentProcess != null && fairnessCounter == currentProcess.priority) {
-        currentProcessId = (currentProcessId + 1) % processes.size();
+        currentProcessId = (currentProcessId + 1) % users.size();
         fairnessCounter = 0;
       } else {
-        if (processes.isEmpty()) {
+        if (users.isEmpty()) {
           break;
         }
       }
-      for(sProcess p : processes){
+      for(sProcess p : users){
         if(p.IOblocked){
           p.DecreaseWait(elapsedTime);
         }

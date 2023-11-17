@@ -18,10 +18,11 @@ import java.util.*;
 
 public class Scheduling {
 
-  private static int processnum = 5;
+  //private static int processnum = 5;
   private static int runTimeAverage = 1000;
   private static int runTimeStdDev = 100;
   private static int runtime = 1000;
+  private static List<User> userList = new ArrayList<>();
   private static List<sProcess> processList = new ArrayList<>();
   private static Results result = new Results("null", "null", 0);
   private static String resultsFile = "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\output\\Summary-Results";
@@ -37,11 +38,11 @@ public class Scheduling {
       in = new Scanner(f);
       while (in.hasNextLine()) {
         line = in.nextLine();
-        if (line.startsWith("numprocess")) {
-          StringTokenizer st = new StringTokenizer(line);
-          st.nextToken();
-          processnum = Common.s2i(st.nextToken());
-        }
+        // if (line.startsWith("numprocess")) {
+        //   StringTokenizer st = new StringTokenizer(line);
+        //   st.nextToken();
+        //   processnum = Common.s2i(st.nextToken());
+        // }
         if (line.startsWith("meandev")) {
           StringTokenizer st = new StringTokenizer(line);
           st.nextToken();
@@ -51,6 +52,14 @@ public class Scheduling {
           StringTokenizer st = new StringTokenizer(line);
           st.nextToken();
           runTimeStdDev = Common.s2i(st.nextToken());
+        }
+        if(line.startsWith("user")){
+          StringTokenizer st = new StringTokenizer(line);
+          st.nextToken();
+          int pNum = Common.s2i(st.nextToken());
+          int w = Common.s2i(st.nextToken());
+          String name = st.nextToken();
+          userList.add(new User(pNum, w, name));
         }
         if (line.startsWith("process")) {
           StringTokenizer st = new StringTokenizer(line);
@@ -62,15 +71,13 @@ public class Scheduling {
           }
           X = X * runTimeStdDev;
           cputime = (int) X + runTimeAverage;
-          int priority = 1;
           int IOBlockedTime = 0;
           try{
-            priority = Integer.parseInt(st.nextToken().trim());
             IOBlockedTime = Integer.parseInt(st.nextToken().trim());
           }catch(NumberFormatException e){
             e.printStackTrace();
           }
-          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0, priority, processList.size(), IOBlockedTime));
+          processList.add(new sProcess(cputime, ioblocking, 0, 0, 0, processList.size(), IOBlockedTime));
         }
         if (line.startsWith("runtime")) {
           StringTokenizer st = new StringTokenizer(line);
@@ -99,6 +106,10 @@ public class Scheduling {
     }
     System.out.println("Working...");
     Init(filepath);
+    int processnum = 0;
+    for(User user : userList){
+      processnum += user.processNum;
+    }
     if (processList.size() < processnum) {
       i = 0;
       while (processList.size() < processnum) {
@@ -108,11 +119,17 @@ public class Scheduling {
         }
         X = X * runTimeStdDev;
         int cputime = (int) X + runTimeAverage;
-        processList.add(new sProcess(cputime, i * 100, 0, 0, 0, 1, processList.size(), 0));
+        processList.add(new sProcess(cputime, i * 100, 0, 0, 0, processList.size(), 0));
         i++;
       }
     }
-    SchedulingAlgorithm scheduler = new SchedulingAlgorithm(processList, runtime, result);
+    for(User user : userList){
+      for(int j = 0; j < processList.size(); j++){
+        user.processes.add(processList.get(j));
+      }
+    } 
+
+    SchedulingAlgorithm scheduler = new SchedulingAlgorithm(userList, runtime, result);
     result = scheduler.run();
     try {
       // BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));
@@ -150,8 +167,8 @@ public class Scheduling {
           out.print(" (ms)\t");
         }
         out.println(process.numblocked + " times");
+        out.close();
       }
-      out.close();
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
