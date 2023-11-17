@@ -49,11 +49,13 @@ public class sProcess {
     return ioblocking - ionext;
   }
 
-  public void DecreaseWait(int s) {
+  public boolean DecreaseWait(int s) {
     timeToIOBlockEnd -= s;
     if(timeToIOBlockEnd <= 0){
       IOblocked = false;
       timeToIOBlockEnd = IOBlockedTime;
+      return true;
     }
+    return false;
   }
 }
