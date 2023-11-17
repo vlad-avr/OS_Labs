@@ -88,6 +88,7 @@ public class SchedulingAlgorithm {
         if(process.cpudone == process.cputime){
           out.println("Process: " + process.id + " held by " + curUser.name + " completed (" + process.toString() + ")");
           curUser.processes.remove(process);
+          result.processes.add(process);
           if(curUser.processes.size() == 0){
             break;
           }

@@ -142,8 +142,8 @@ public class Scheduling {
       out.println("Mean: " + runTimeAverage);
       out.println("Standard Deviation: " + runTimeStdDev);
       out.println("Process\tCPU Time\tIO Blocking\tCPU Completed\tCPU Blocked");
-      for (i = 0; i < processList.size(); i++) {
-        sProcess process = (sProcess) processList.get(i);
+      for (i = 0; i < result.processes.size(); i++) {
+        sProcess process = (sProcess) result.processes.get(i);
         out.print(Integer.toString(i));
         if (i < 100) {
           out.print("\t\t");
@@ -168,9 +168,9 @@ public class Scheduling {
         } else {
           out.print(" (ms)\t");
         }
-        out.println(process.numblocked + " times");
-        out.close();
+        out.println(process.numblocked + " times\n");
       }
+      out.close();
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
