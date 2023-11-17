@@ -15,8 +15,8 @@ public class SchedulingAlgorithm {
   private List<User> users;
   private int runtime;
   private Results result;
-  private final int maxQuantum = 50;
-  private final int skipQuantum = 20;
+  private final int maxQuantum = 250;
+  private final int skipQuantum = 50;
 
   public SchedulingAlgorithm(List<User> users, int runtime, Results result) {
     this.users = users;
@@ -44,7 +44,6 @@ public class SchedulingAlgorithm {
     result.schedulingType = "Preemptive";
     result.schedulingName = "Fair-Share";
     while (comptime < runtime && !users.isEmpty()) {
-      currentUserID = (currentUserID+1)%users.size();
       curUser = users.get(currentUserID);
       if(curUser.processes.size() == 0){
         continue;
@@ -62,9 +61,9 @@ public class SchedulingAlgorithm {
           }
           int cSize = blockedProcesses.size();
           for(int k = 0; k < cSize; k++){
-            sProcess blockedProcess = blockedProcesses.get(i);
+            sProcess blockedProcess = blockedProcesses.get(k);
             if(blockedProcess.DecreaseWait(skipQuantum)){
-              blockedProcesses.remove(blockedProcess);
+              blockedProcesses.remove(k);
               k--;
               cSize--;
             }
@@ -72,21 +71,22 @@ public class SchedulingAlgorithm {
           continue;
         }
         out.println("Process: " + process.id + " held by " + curUser.name + " registered (" + process.toString() + ")");
-        int timeToIOBlock = process.timeToIOBlock();
-        if(quantumLeft < timeToIOBlock){
+        int elapsedTime = Math.min(quantumLeft, Math.min(process.timeToComplete(), process.timeToIOBlock()));
+        process.addTime(elapsedTime);
+        if(quantumLeft == elapsedTime){
           process.addTime(quantumLeft);
           out.println(
               "Process: " + process.id + " held by " + curUser.name + " blocked (exceeded quantum) (" + process.toString() + ")");
           quantumLeft = maxQuantum;
           i++;
-        }else{
-          quantumLeft -= timeToIOBlock;
-          process.addTime(timeToIOBlock);
+        }else if(process.timeToIOBlock() == elapsedTime){
+          quantumLeft -= process.timeToIOBlock();
+          process.addTime(process.timeToIOBlock());
           out.println("Process: " + process.id + " held by " + curUser.name + " I/O blocked (" + process.toString() + ")");
+          process.numblocked++;
           process.IOblocked = true;
           blockedProcesses.add(process);
         }
-
         if(process.cpudone == process.cputime){
           out.println("Process: " + process.id + " held by " + curUser.name + " completed (" + process.toString() + ")");
           curUser.processes.remove(process);
@@ -97,7 +97,10 @@ public class SchedulingAlgorithm {
             j = -1;
           }
         }
-
+        currentUserID = (currentUserID+1)%users.size();
+      }
+      if(curUser.processes.size() == 0){
+        users.remove(curUser);
       }
     }
 

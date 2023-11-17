@@ -39,6 +39,9 @@ public class sProcess {
   public void addTime(int time) {
     cpudone += time;
     ionext += time;
+    if(ionext == ioblocking){
+      ionext = 0;
+    }
   }
 
   public int timeToComplete(){
