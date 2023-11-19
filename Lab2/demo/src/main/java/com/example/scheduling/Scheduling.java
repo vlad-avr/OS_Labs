@@ -149,10 +149,10 @@ public class Scheduling {
       out.println("Simulation Run Time: " + result.compuTime);
       out.println("Mean: " + runTimeAverage);
       out.println("Standard Deviation: " + runTimeStdDev);
-      out.println("Process\tCPU Time\tIO Blocking\tCPU Completed\tCPU Blocked");
+      out.println("Process\tCPU Time\tTo IO Block\tIO Blocked\tCPU Completed\tCPU Blocked");
       for (i = 0; i < result.processes.size(); i++) {
         sProcess process = (sProcess) result.processes.get(i);
-        out.print(Integer.toString(i));
+        out.print(Integer.toString(process.id));
         if (i < 100) {
           out.print("\t\t");
         } else {
@@ -166,6 +166,12 @@ public class Scheduling {
         }
         out.print(Integer.toString(process.ioblocking));
         if (process.ioblocking < 100) {
+          out.print(" (ms)\t\t");
+        } else {
+          out.print(" (ms)\t");
+        }
+        out.print(Integer.toString(process.IOBlockedTime));
+        if (process.IOBlockedTime < 100) {
           out.print(" (ms)\t\t");
         } else {
           out.print(" (ms)\t");
