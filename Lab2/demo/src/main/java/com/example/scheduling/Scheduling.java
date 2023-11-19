@@ -22,6 +22,8 @@ public class Scheduling {
   private static int runTimeAverage = 1000;
   private static int runTimeStdDev = 100;
   private static int runtime = 1000;
+  private static int maxQuantum = 250;
+  private static int skipQuantum = 50;
   private static List<User> userList = new ArrayList<>();
   private static List<sProcess> processList = new ArrayList<>();
   private static Results result = new Results("null", "null", 0);
@@ -52,6 +54,12 @@ public class Scheduling {
           StringTokenizer st = new StringTokenizer(line);
           st.nextToken();
           runTimeStdDev = Common.s2i(st.nextToken());
+        }
+        if(line.startsWith("quantum")){
+          StringTokenizer st = new StringTokenizer(line);
+          st.nextToken();
+          maxQuantum = Common.s2i(st.nextToken());
+          skipQuantum = Common.s2i(st.nextToken());
         }
         if(line.startsWith("user")){
           StringTokenizer st = new StringTokenizer(line);
@@ -131,7 +139,7 @@ public class Scheduling {
       }
     } 
 
-    SchedulingAlgorithm scheduler = new SchedulingAlgorithm(userList, runtime, result);
+    SchedulingAlgorithm scheduler = new SchedulingAlgorithm(userList, runtime, result, maxQuantum, skipQuantum);
     result = scheduler.run();
     try {
       // BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));

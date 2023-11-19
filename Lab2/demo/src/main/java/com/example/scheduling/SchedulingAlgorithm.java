@@ -15,13 +15,15 @@ public class SchedulingAlgorithm {
   private List<User> users;
   private int runtime;
   private Results result;
-  private final int maxQuantum = 250;
-  private final int skipQuantum = 50;
+  private final int maxQuantum;
+  private final int skipQuantum;
 
-  public SchedulingAlgorithm(List<User> users, int runtime, Results result) {
+  public SchedulingAlgorithm(List<User> users, int runtime, Results result, int maxQuantum, int skipQuantum) {
     this.users = users;
     this.runtime = runtime;
     this.result = result;
+    this.maxQuantum = maxQuantum;
+    this.skipQuantum = skipQuantum;
     try {
       out = new PrintStream(new FileOutputStream(
           "D:\\Java\\OS_Labs\\Lab2\\demo\\src\\main\\java\\com\\example\\output\\Summary-Processes"));
