@@ -43,7 +43,7 @@ public class SchedulingAlgorithm {
     //   gWeight += user.weight;
     // }
     // boolean isCompleted = false;
-    result.schedulingType = "Preemptive";
+    result.schedulingType = "Preemptive Interactive";
     result.schedulingName = "Fair-Share";
     while (comptime < runtime && !users.isEmpty()) {
       curUser = users.get(currentUserID);
