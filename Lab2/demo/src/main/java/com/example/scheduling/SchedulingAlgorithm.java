@@ -80,14 +80,15 @@ public class SchedulingAlgorithm {
               "Process: " + process.id + " held by " + curUser.name + " blocked (exceeded quantum) (" + process.toString() + ")");
           quantumLeft = maxQuantum;
           i++;
-        }else if(process.timeToIOBlock() == elapsedTime){
-          quantumLeft -= process.timeToIOBlock();
+        }else if(process.timeToIOBlock() == 0){
+          quantumLeft -= elapsedTime;
           out.println("Process: " + process.id + " held by " + curUser.name + " I/O blocked (" + process.toString() + ")");
           process.numblocked++;
           process.IOblocked = true;
           blockedProcesses.add(process);
         }
-        if(process.cpudone == process.cputime){
+        else if(process.timeToComplete() == 0){
+          quantumLeft -= elapsedTime;
           out.println("Process: " + process.id + " held by " + curUser.name + " completed (" + process.toString() + ")");
           curUser.processes.remove(process);
           result.processes.add(process);
